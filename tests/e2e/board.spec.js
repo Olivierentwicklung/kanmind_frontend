@@ -99,8 +99,16 @@ test('task creation sends the current form contract', async ({ page }) => {
   await page.locator('#create_edit_task_date_input').fill('2099-09-30');
   await page.locator('#create_edit_task_prio_head').click();
   await page.locator('#create_edit_task_dialog .dropdown').last().getByText('High', { exact: true }).click();
+  await expect(page.locator('#create_edit_task_dialog_select')).toHaveValue('review');
+  await expect(page.locator('#create_edit_task_date_input')).toHaveValue('2099-09-30');
+  await expect(page.locator('#create_edit_task_prio_head')).toContainText('high');
+
+  const taskRequestPromise = page.waitForRequest((request) =>
+    request.method() === 'POST' && new URL(request.url()).pathname === '/api/tasks/',
+  );
   await page.locator('#create_edit_task_dialog').getByRole('button', { name: 'Add', exact: true }).click();
-  await expectApiCall(state, 'POST', '/api/tasks', {
+  const taskRequest = await taskRequestPromise;
+  const expectedTask = {
     board: 7,
     title: 'Angular parity check',
     description: 'Protect behavior',
@@ -109,7 +117,9 @@ test('task creation sends the current form contract', async ({ page }) => {
     reviewer_id: null,
     assignee_id: null,
     due_date: '2099-09-30',
-  });
+  };
+  expect(taskRequest.postDataJSON()).toEqual(expectedTask);
+  await expectApiCall(state, 'POST', '/api/tasks', expectedTask);
   await expect(page.locator('#review_column')).toContainText('Angular parity check');
 });
 
