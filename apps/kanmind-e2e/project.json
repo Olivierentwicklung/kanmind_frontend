@@ -1,0 +1,11 @@
+{
+  "name": "kanmind-e2e",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "application",
+  "sourceRoot": "apps/kanmind-e2e/src",
+  "implicitDependencies": [
+    "kanmind"
+  ],
+  "// targets": "to see all targets run: nx show project kanmind-e2e --web",
+  "targets": {}
+}

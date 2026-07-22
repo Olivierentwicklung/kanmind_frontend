@@ -2,8 +2,16 @@ node_modules/
 test-results/
 playwright-report/
 debug.log
-
-# Local Codex/agent instructions
-.agents/
-AGENTS.md
-CODEX-USAGE-GUIDE.md
+.nx/
+.angular/
+dist/
+coverage/
+tmp/
+.cache/
+.DS_Store
+*.tsbuildinfo
+.nx/cache
+.nx/workspace-data
+.nx/migrate-runs
+__screenshots__/
+vitest.config.*.timestamp*
