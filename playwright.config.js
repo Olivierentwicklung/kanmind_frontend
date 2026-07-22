@@ -5,7 +5,9 @@ module.exports = defineConfig({
   fullyParallel: true,
   forbidOnly: Boolean(process.env.CI),
   retries: process.env.CI ? 2 : 0,
-  workers: process.env.CI ? 1 : undefined,
+  // Keep local Chromium context creation stable on development machines.
+  // CI remains sequential for maximum reproducibility.
+  workers: process.env.CI ? 1 : 2,
   reporter: [
     [process.env.CI ? 'line' : 'list'],
     ['html', { open: 'never' }],
