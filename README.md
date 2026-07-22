@@ -64,6 +64,6 @@ npm run test:e2e:ui
 npm run test:e2e:report
 ```
 
-Playwright startet den lokalen Frontend-Server automatisch. Die Tests laufen in Desktop Chromium und in einer mobilen Pixel-5-Emulation. In GitHub Actions werden sie bei Pushes und Pull Requests auf `main` ausgeführt.
+Playwright startet den lokalen Frontend-Server automatisch. Die Charakterisierungstests decken Authentifizierung, Registrierung, Dashboard, Board-Liste, Board- und Task-Interaktionen, rechtliche Seiten sowie API-Verträge ab. Alle Tests laufen in Desktop Chromium und in einer mobilen Pixel-5-Emulation. In GitHub Actions werden sie bei Pushes und Pull Requests auf `main` ausgeführt.
 
 ---
