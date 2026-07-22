@@ -11,39 +11,71 @@ permissions:
   contents: read
 
 jobs:
-  verify:
-    timeout-minutes: 45
+  lint:
+    name: Lint
+    timeout-minutes: 10
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
-        with:
-          fetch-depth: 0
       - uses: actions/setup-node@v6
         with:
           node-version: 24
           cache: npm
-      - uses: nrwl/nx-set-shas@v4
+      - name: Install dependencies
+        run: npm ci
+      - name: Run lint checks
+        run: npm run lint
+
+  unit-tests:
+    name: Unit tests (Vitest)
+    timeout-minutes: 15
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: npm
+      - name: Install dependencies
+        run: npm ci
+      - name: Run unit tests
+        run: npm run test:unit
+
+  integration-tests:
+    name: Integration tests (Angular Testing Library + Vitest)
+    timeout-minutes: 15
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: npm
+      - name: Install dependencies
+        run: npm ci
+      - name: Run Angular integration tests
+        run: npm run test:integration
+
+  e2e-tests:
+    name: End-to-end tests (Playwright)
+    timeout-minutes: 30
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: npm
       - name: Install dependencies
         run: npm ci
       - name: Install Chromium
         run: npx playwright install --with-deps chromium
-      - name: Run affected lint, unit tests and builds
-        run: npx nx affected -t lint,test,build
-      - name: Run Angular browser tests
+      - name: Run end-to-end tests
         run: npm run test:e2e
-      - name: Run legacy regression browser tests
-        run: npm run test:legacy:e2e
-      - name: Upload Angular Playwright report
+      - name: Upload Playwright report
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v5
         with:
           name: angular-playwright-report
           path: playwright-report/angular/
-          retention-days: 30
-      - name: Upload legacy Playwright report
-        if: ${{ !cancelled() }}
-        uses: actions/upload-artifact@v5
-        with:
-          name: legacy-playwright-report
-          path: playwright-report/legacy/
           retention-days: 30

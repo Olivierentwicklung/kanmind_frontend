@@ -1,23 +1,20 @@
-import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
+import { render, screen } from '@testing-library/angular/zoneless';
 import { ImprintPage } from './imprint-page';
 import { PrivacyPage } from './privacy-page';
 
 describe('legal pages', () => {
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({ imports: [PrivacyPage, ImprintPage], providers: [provideRouter([])] }).compileComponents();
+  it('renders the privacy policy content and navigation', async () => {
+    await render(PrivacyPage, { providers: [provideRouter([])] });
+
+    expect(screen.getByRole('heading', { level: 1, name: 'Privacy Policy' })).toBeTruthy();
+    expect(screen.getByRole('link', { name: 'Imprint' }).getAttribute('href')).toBe('/imprint');
   });
 
-  it('renders the privacy policy content and navigation', () => {
-    const fixture = TestBed.createComponent(PrivacyPage); fixture.detectChanges();
-    const element = fixture.nativeElement as HTMLElement;
-    expect(element.querySelector('h1')?.textContent).toContain('Privacy Policy');
-    expect(element.querySelector('a[href="/imprint"]')).toBeTruthy();
-  });
+  it('renders the legal notice contact details', async () => {
+    await render(ImprintPage, { providers: [provideRouter([])] });
 
-  it('renders the legal notice contact details', () => {
-    const fixture = TestBed.createComponent(ImprintPage); fixture.detectChanges();
-    expect((fixture.nativeElement as HTMLElement).textContent).toContain('Max Mustermann');
-    expect((fixture.nativeElement as HTMLElement).querySelector('a[href="mailto:info@example.com"]')).toBeTruthy();
+    expect(screen.getByText('Max Mustermann')).toBeTruthy();
+    expect(screen.getByRole('link', { name: 'info@example.com' }).getAttribute('href')).toBe('mailto:info@example.com');
   });
 });

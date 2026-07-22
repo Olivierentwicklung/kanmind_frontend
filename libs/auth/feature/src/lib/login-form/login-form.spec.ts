@@ -1,50 +1,65 @@
-import { TestBed } from '@angular/core/testing';
+import { inputBinding, outputBinding } from '@angular/core';
 import { provideRouter } from '@angular/router';
+import { fireEvent, render, screen } from '@testing-library/angular/zoneless';
+import { vi } from 'vitest';
 import { LoginForm } from './login-form';
 
 describe('LoginForm', () => {
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({ imports: [LoginForm], providers: [provideRouter([])] }).compileComponents();
+  it('renders accessible login controls', async () => {
+    await render(LoginForm, { providers: [provideRouter([])] });
+
+    expect(screen.getByRole('textbox', { name: 'Email' })).toBeTruthy();
+    expect(screen.getByLabelText('Password')).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Log in' })).toBeTruthy();
   });
 
-  it('renders accessible login controls', () => {
-    const fixture = TestBed.createComponent(LoginForm); fixture.detectChanges();
-    const element = fixture.nativeElement as HTMLElement;
-    expect(element.querySelector('label[for="email"]')?.textContent).toContain('Email');
-    expect(element.querySelector('label[for="password"]')?.textContent).toContain('Password');
-    expect(element.querySelector('button[type="submit"]')?.textContent).toContain('Log in');
-  });
+  it('shows validation after an invalid submission and emits nothing', async () => {
+    const submitted = vi.fn();
+    const { fixture } = await render(LoginForm, {
+      providers: [provideRouter([])],
+      bindings: [outputBinding('submitted', submitted)],
+    });
 
-  it('shows validation after an invalid submission and emits nothing', () => {
-    const fixture = TestBed.createComponent(LoginForm); fixture.detectChanges();
-    let emitted = false; fixture.componentInstance.submitted.subscribe(() => emitted = true);
-    (fixture.nativeElement as HTMLElement).querySelector('form')?.dispatchEvent(new Event('submit'));
-    fixture.detectChanges();
-    expect(emitted).toBe(false);
+    fireEvent.click(screen.getByRole('button', { name: 'Log in' }));
+
+    expect(submitted).not.toHaveBeenCalled();
     expect(fixture.componentInstance.showError('email')).toBe(true);
     expect(fixture.componentInstance.showError('password')).toBe(true);
   });
 
-  it('toggles password visibility', () => {
-    const fixture = TestBed.createComponent(LoginForm); fixture.detectChanges();
-    const button = (fixture.nativeElement as HTMLElement).querySelector<HTMLButtonElement>('.password-toggle');
-    button?.click(); fixture.detectChanges();
-    expect((fixture.nativeElement as HTMLElement).querySelector<HTMLInputElement>('#password')?.type).toBe('text');
-    expect(button?.getAttribute('aria-label')).toBe('Hide password');
+  it('toggles password visibility', async () => {
+    const { fixture } = await render(LoginForm, { providers: [provideRouter([])] });
+
+    fireEvent.click(screen.getByRole('button', { name: 'Show password' }));
+    await fixture.whenStable();
+
+    expect((screen.getByLabelText('Password') as HTMLInputElement).type).toBe('text');
+    expect(screen.getByRole('button', { name: 'Hide password' })).toBeTruthy();
   });
 
-  it('emits a typed command for valid input', () => {
-    const fixture = TestBed.createComponent(LoginForm); fixture.detectChanges();
+  it('emits a typed command for valid input', async () => {
     const command = { email: 'user@example.com', password: 'secret' };
-    fixture.componentInstance.form.setValue(command);
-    let emitted: unknown; fixture.componentInstance.submitted.subscribe((value) => emitted = value);
-    fixture.componentInstance.submit();
-    expect(emitted).toEqual(command);
+    const submitted = vi.fn();
+    await render(LoginForm, {
+      providers: [provideRouter([])],
+      bindings: [outputBinding('submitted', submitted)],
+    });
+
+    fireEvent.input(screen.getByRole('textbox', { name: 'Email' }), { target: { value: command.email } });
+    fireEvent.input(screen.getByLabelText('Password'), { target: { value: command.password } });
+    fireEvent.click(screen.getByRole('button', { name: 'Log in' }));
+
+    expect(submitted).toHaveBeenCalledWith(command);
   });
 
-  it('disables actions while loading', () => {
-    const fixture = TestBed.createComponent(LoginForm); fixture.componentRef.setInput('loading', true); fixture.detectChanges();
-    expect((fixture.nativeElement as HTMLElement).querySelectorAll('button:disabled').length).toBe(2);
-    expect((fixture.nativeElement as HTMLElement).textContent).toContain('Logging in');
+  it('disables actions while loading', async () => {
+    const { fixture } = await render(LoginForm, {
+      providers: [provideRouter([])],
+      bindings: [inputBinding('loading', () => true)],
+    });
+    await fixture.whenStable();
+
+    expect(screen.getAllByRole('button').filter((button) => (button as HTMLButtonElement).disabled)).toHaveLength(2);
+    expect(screen.getByText(/Logging in/)).toBeTruthy();
   });
 });
