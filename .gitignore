@@ -2,3 +2,8 @@ node_modules/
 test-results/
 playwright-report/
 debug.log
+
+# Local Codex/agent instructions
+.agents/
+AGENTS.md
+CODEX-USAGE-GUIDE.md
