@@ -1,0 +1,16 @@
+{
+  "name": "legal-feature",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/legal/feature/src",
+  "prefix": "lib",
+  "projectType": "library",
+  "tags": [
+    "scope:legal",
+    "type:feature"
+  ],
+  "targets": {
+    "lint": {
+      "executor": "@nx/eslint:lint"
+    }
+  }
+}
