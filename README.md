@@ -36,3 +36,34 @@ Dieses Frontend wurde bewusst mit **Vanilla JavaScript** erstellt, um die folgen
 Dieses Projekt ist **ausschließlich für Schüler der Developer Akademie** gedacht und nicht zur freien Nutzung oder Weitergabe freigegeben.
 
 ---
+
+## End-to-End-Tests mit Playwright
+
+Die Browser-Tests verwenden gemockte API-Antworten. Das Django-Backend muss daher nicht laufen.
+
+### Installation
+
+```bash
+npm install
+npx playwright install chromium
+```
+
+### Befehle
+
+```bash
+# Tests im Headless-Modus ausführen
+npm run test:e2e
+
+# Tests mit sichtbarem Browser ausführen
+npm run test:e2e:headed
+
+# Interaktiven Playwright-Test-Runner starten
+npm run test:e2e:ui
+
+# Den letzten HTML-Bericht öffnen
+npm run test:e2e:report
+```
+
+Playwright startet den lokalen Frontend-Server automatisch. Die Tests laufen in Desktop Chromium und in einer mobilen Pixel-5-Emulation. In GitHub Actions werden sie bei Pushes und Pull Requests auf `main` ausgeführt.
+
+---
