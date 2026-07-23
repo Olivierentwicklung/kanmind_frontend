@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, inject, OnInit } from '@angular/core';
-import { Router, RouterLink } from '@angular/router';
+import { Router } from '@angular/router';
 import {
   DashboardOverviewView,
   DashboardStore,
@@ -7,12 +7,13 @@ import {
   DashboardTaskSelection,
 } from '@kanmind/dashboard/domain';
 import { AuthStore } from '@kanmind/auth/domain';
+import { AppShell } from '@kanmind/shared/ui';
 import { DashboardOverview } from '../dashboard-overview/dashboard-overview';
 import { TaskInsights } from '../task-insights/task-insights';
 
 @Component({
   selector: 'lib-dashboard-page',
-  imports: [DashboardOverview, RouterLink, TaskInsights],
+  imports: [AppShell, DashboardOverview, TaskInsights],
   providers: [DashboardStore],
   templateUrl: './dashboard-page.html',
   styleUrl: './dashboard-page.css',

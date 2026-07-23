@@ -8,6 +8,7 @@ import {
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { AuthStore } from '@kanmind/auth/domain';
 import { BoardStore } from '@kanmind/boards/domain';
+import { AppShell } from '@kanmind/shared/ui';
 import { BoardSettingsDialog } from '../board-settings-dialog/board-settings-dialog';
 import { BoardView } from '../board-view/board-view';
 import { TaskDetailDialog } from '../task-detail-dialog/task-detail-dialog';
@@ -18,6 +19,7 @@ import { TaskFormDialog } from '../task-form-dialog/task-form-dialog';
   imports: [
     BoardSettingsDialog,
     BoardView,
+    AppShell,
     RouterLink,
     TaskDetailDialog,
     TaskFormDialog,
@@ -60,6 +62,8 @@ export class BoardPage implements OnInit {
     const boardId = Number(this.route.snapshot.queryParamMap.get('id'));
     if (Number.isInteger(boardId) && boardId > 0) {
       this.store.loadBoard(boardId);
+    } else {
+      void this.router.navigate(['/boards']);
     }
   }
 }

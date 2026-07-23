@@ -1,6 +1,6 @@
 # KanMind Frontend
 
-KanMind is being migrated from vanilla JavaScript to a strict, standalone, zoneless Angular 22 application in an integrated Nx workspace. Login, Privacy Policy, and Imprint are native Angular features. Registration, dashboard, boards, and tasks are explicit migration placeholders. The complete vanilla application and its 128-browser-check regression suite remain runnable as the comparison baseline.
+KanMind is a standalone, zoneless Angular 22 application in an integrated Nx workspace. Authentication, legal pages, dashboard, boards, board settings, tasks, and comments are native Angular features. The complete vanilla application remains runnable as a frozen comparison baseline.
 
 ## Requirements and setup
 
@@ -26,6 +26,9 @@ libs/auth/feature            Lazy login page and form
 libs/auth/domain             Session contracts, guard, root Signal Store
 libs/auth/data-access        Login API, storage and auth interceptor
 libs/legal/feature           Lazy Privacy and Imprint pages
+libs/dashboard/*             Dashboard feature, domain state and data access
+libs/boards/*                Boards/tasks feature, domain state and data access
+libs/shared/ui               Reusable responsive application shell
 ```
 
 Nx tags enforce `app -> feature -> domain/data-access` and `domain -> data-access`. Cross-library imports use the public aliases in `tsconfig.base.json`.
@@ -67,8 +70,8 @@ The frontend posts `{ email, password }` to `POST /api/login/` and adapts `{ tok
 
 NgRx Signal Store `22.0.0-beta.0` is pinned because it is the published line declaring Angular 22 peer compatibility; the stable NgRx 21 line declares Angular 21 peers.
 
-## Migration workflow
+## Regression workflow
 
-Implement one complete Angular vertical slice at a time, add unit and Angular Playwright coverage, then run the unchanged legacy suite to detect behavioral drift. Angular owns copied CSS, fonts, icons, and login assets; do not import runtime assets or code from `kanmind-legacy`. The legacy snapshot is a regression reference, not a production fallback.
+Add unit and Angular Playwright coverage for behavior changes, then run the unchanged legacy suite when checking behavioral parity. Angular owns its CSS, fonts, and icons; it does not import runtime assets or code from `kanmind-legacy`. The legacy snapshot is a regression reference, not a production fallback.
 
 Repository engineering policy is tracked in `AGENTS.md`, `CODEX-USAGE-GUIDE.md`, and `.agents/skills/`.

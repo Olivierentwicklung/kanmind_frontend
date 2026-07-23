@@ -121,7 +121,7 @@ test('settings preserve the owner, rename, and confirm deletion', async ({ page 
   await expect(page.getByRole('button', { name: 'Remove grace@example.com' })).toBeVisible();
 
   await page.getByRole('button', { name: 'Edit board title' }).click();
-  await page.getByLabel('Board title').fill('Renamed Board');
+  await page.getByRole('textbox', { name: 'Board title' }).fill('Renamed Board');
   await page.getByRole('button', { name: 'Save title' }).click();
   await expect(page.getByRole('heading', { name: 'Renamed Board' })).toBeVisible();
 

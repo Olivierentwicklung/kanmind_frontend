@@ -6,6 +6,12 @@
 @import './styles/legacy/form.css';
 @import './styles/legacy/header_footer.css';
 
+html,
+body {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
 html, body { min-height: 100%; }
 body { margin: 0; }
 .login-page { background-image: url('./assets/icons/login_background.svg'); }

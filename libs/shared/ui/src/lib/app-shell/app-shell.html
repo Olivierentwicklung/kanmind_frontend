@@ -1,0 +1,35 @@
+<header class="main_header w_full">
+  <a [routerLink]="fullName() ? '/dashboard' : '/login'" aria-label="KanMind home">
+    <img src="/assets/icons/logo_icon.svg" alt="KanMind">
+  </a>
+  <nav class="header-actions" aria-label="Primary">
+    @if (fullName()) {
+      <a routerLink="/dashboard" class="header-link">
+        <img src="/assets/icons/dashboard.svg" alt="">
+        <span>Dashboard</span>
+      </a>
+      <a routerLink="/boards" class="header-link">
+        <img src="/assets/icons/view_board_yellow.svg" alt="">
+        <span>Boards</span>
+      </a>
+      <span class="profile_circle" [attr.aria-label]="'Signed in as ' + fullName()">
+        {{ initials() }}
+      </span>
+      <button type="button" class="header-link" (click)="logoutRequested.emit()">
+        <img src="/assets/icons/logout.svg" alt="">
+        <span>Log out</span>
+      </button>
+    } @else {
+      <a routerLink="/login" class="header-link">Log in</a>
+    }
+  </nav>
+</header>
+
+<ng-content />
+
+<footer class="main_footer w_full">
+  <nav class="footer-links" aria-label="Legal">
+    <a routerLink="/privacy" class="link">Privacy Policy</a>
+    <a routerLink="/imprint" class="link">Imprint</a>
+  </nav>
+</footer>

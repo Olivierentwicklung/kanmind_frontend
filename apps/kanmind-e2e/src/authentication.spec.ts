@@ -18,6 +18,8 @@ test('legacy login URL redirects and preserves its query', async ({ page }) => {
 test('invalid form exposes email and password validation', async ({ page }) => {
   await page.goto('/login');
   await page.getByLabel('Email').fill('not-an-email');
+  await page.getByLabel('Password', { exact: true }).fill('x');
+  await page.getByLabel('Password', { exact: true }).fill('');
   await page.getByRole('button', { name: 'Log in', exact: true }).click();
   await expect(page.getByText('Please enter a valid email address.')).toBeVisible();
   await expect(page.getByText('Password is required.')).toBeVisible();

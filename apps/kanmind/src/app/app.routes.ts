@@ -1,6 +1,5 @@
 import { Route } from '@angular/router';
-import { authGuard, landingGuard } from '@kanmind/auth/domain';
-import { MigrationPlaceholder } from './migration-placeholder';
+import { authGuard, landingRedirect } from '@kanmind/auth/domain';
 import { NotFound } from './not-found';
 
 const legacyRedirects: Route[] = [
@@ -17,7 +16,7 @@ const legacyRedirects: Route[] = [
 ];
 
 export const appRoutes: Route[] = [
-  { path: '', pathMatch: 'full', canActivate: [landingGuard], component: MigrationPlaceholder },
+  { path: '', pathMatch: 'full', redirectTo: landingRedirect },
   { path: 'login', loadChildren: () => import('@kanmind/auth/feature').then((m) => m.AUTH_ROUTES) },
   { path: 'register', loadChildren: () => import('@kanmind/auth/feature').then((m) => m.REGISTER_ROUTES) },
   { path: '', loadChildren: () => import('@kanmind/legal/feature').then((m) => m.LEGAL_ROUTES) },

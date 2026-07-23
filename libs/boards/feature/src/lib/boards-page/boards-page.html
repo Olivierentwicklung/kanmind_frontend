@@ -1,22 +1,7 @@
-<header class="main_header w_full">
-  <a routerLink="/dashboard" aria-label="KanMind dashboard">
-    <img src="/assets/icons/logo_icon.svg" alt="KanMind">
-  </a>
-  <nav class="header-actions" aria-label="Primary">
-    <a routerLink="/dashboard" class="header-link">
-      <img src="/assets/icons/dashboard.svg" alt="">
-      Dashboard
-    </a>
-    <span class="profile_circle" [attr.aria-label]="'Signed in as ' + (authStore.session()?.fullName ?? '')">
-      {{ (authStore.session()?.fullName ?? '').slice(0, 1) }}
-    </span>
-    <button type="button" class="header-link" (click)="authStore.logout()">
-      <img src="/assets/icons/logout.svg" alt="">
-      Log out
-    </button>
-  </nav>
-</header>
-
+<lib-app-shell
+  [fullName]="authStore.session()?.fullName ?? null"
+  (logoutRequested)="authStore.logout()"
+>
 <main class="boards-main w_full">
   <nav class="breadcrumbs" aria-label="Breadcrumb">
     <a routerLink="/dashboard" class="link_secondary">Dashboard</a>
@@ -70,13 +55,7 @@
     }
   </section>
 </main>
-
-<footer class="main_footer w_full">
-  <nav class="footer-links" aria-label="Legal">
-    <a routerLink="/privacy" class="link">Privacy Policy</a>
-    <a routerLink="/imprint" class="link">Imprint</a>
-  </nav>
-</footer>
+</lib-app-shell>
 
 @if (store.dialog() === 'create') {
   <lib-create-board-dialog

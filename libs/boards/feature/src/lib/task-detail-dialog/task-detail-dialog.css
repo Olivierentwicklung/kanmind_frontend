@@ -3,12 +3,14 @@
   z-index: 20;
   inset: 0;
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  overflow-x: hidden;
   overflow-y: auto;
   place-items: center;
   padding: 32px;
   background: rgb(0 0 0 / 60%);
 }
-.detail-dialog { width: min(760px, 100%); padding: clamp(24px, 5vw, 48px); }
+.detail-dialog { width: 100%; max-width: 760px; min-width: 0; padding: clamp(24px, 5vw, 48px); }
 .dialog-header, .dialog-header div, .person, .new-comment, .comment, .comment header {
   display: flex;
   align-items: center;
@@ -16,6 +18,14 @@
 }
 .dialog-header { justify-content: space-between; }
 .icon-button, .new-comment button, .comment button { border: 0; background: transparent; cursor: pointer; }
+.new-comment button {
+  z-index: 1;
+  display: grid;
+  width: 44px;
+  height: 44px;
+  padding: 10px;
+  place-items: center;
+}
 .icon-button img, .new-comment img, .comment img { width: 24px; height: 24px; }
 .status-field { display: flex; flex-direction: column; gap: 6px; margin: 24px 0; color: var(--font_white_color); }
 select, textarea {
@@ -51,4 +61,6 @@ button:focus-visible, select:focus-visible, textarea:focus-visible {
 @media (max-width: 600px) {
   .dialog-backdrop { padding: 12px; }
   .task-information { grid-template-columns: 1fr; }
+  .new-comment { padding-bottom: 40px; }
+  .new-comment button { right: 4px; bottom: 4px; padding: 8px; }
 }
