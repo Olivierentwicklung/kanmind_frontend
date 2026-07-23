@@ -1,4 +1,9 @@
-import { ChangeDetectionStrategy, Component, inject, input } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  inject,
+  input,
+} from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { AuthStore } from '@kanmind/auth/domain';
 import { AppShell } from '@kanmind/shared/ui';
@@ -23,7 +28,20 @@ import { AppShell } from '@kanmind/shared/ui';
       </main>
     </lib-app-shell>
   `,
-  styles: [`:host { display: flex; flex-direction: column; min-height: 100vh; width: 100%; } main { flex: 1; align-items: flex-start; }`],
+  styles: [
+    `
+      :host {
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+        width: 100%;
+      }
+      main {
+        flex: 1;
+        align-items: flex-start;
+      }
+    `,
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class LegalPageShell {
