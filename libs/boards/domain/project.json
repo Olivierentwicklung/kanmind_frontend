@@ -1,0 +1,13 @@
+{
+  "name": "boards-domain",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/boards/domain/src",
+  "prefix": "lib",
+  "projectType": "library",
+  "tags": ["scope:boards", "type:domain"],
+  "targets": {
+    "lint": {
+      "executor": "@nx/eslint:lint"
+    }
+  }
+}
