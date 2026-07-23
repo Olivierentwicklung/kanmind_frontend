@@ -3,6 +3,13 @@ export interface LoginCommand {
   password: string;
 }
 
+export interface RegistrationCommand {
+  fullname: string;
+  email: string;
+  password: string;
+  repeated_password: string;
+}
+
 export interface AuthSession {
   token: string;
   userId: number;
@@ -12,6 +19,9 @@ export interface AuthSession {
 
 export type AuthStatus = 'idle' | 'loading' | 'authenticated' | 'error';
 export type AuthError = 'invalidCredentials' | 'network' | 'unexpected';
+export type RegistrationError =
+  | { kind: 'validation'; messages: readonly string[] }
+  | { kind: 'network' | 'unexpected' };
 
 export const GUEST_LOGIN: LoginCommand = {
   email: 'kevin@kovacsi.de',

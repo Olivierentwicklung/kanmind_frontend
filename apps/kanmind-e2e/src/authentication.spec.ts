@@ -69,3 +69,68 @@ test('guest login submits the configured demo account', async ({ page }) => {
   await expect(page).toHaveURL(/\/dashboard$/);
   expect(requestBody).toEqual({ email: 'kevin@kovacsi.de', password: 'asdasdasd' });
 });
+
+test('registration validates required fields and matching passwords', async ({ page }) => {
+  await page.goto('/register');
+  await page.getByLabel('Full name').fill('Ada');
+  await page.getByLabel('Email').fill('broken');
+  await page.getByLabel('Password', { exact: true }).fill('long-enough');
+  await page.getByLabel('Confirm password', { exact: true }).fill('different');
+  await page.getByRole('button', { name: 'Sign up', exact: true }).click();
+
+  await expect(page.getByText('Enter your full name')).toBeVisible();
+  await expect(page.getByText('Please enter a valid email address.')).toBeVisible();
+  await expect(page.getByText('Passwords do not match.')).toBeVisible();
+  await expect(page.getByText('Please accept the privacy policy.')).toBeVisible();
+});
+
+test('successful registration preserves the wire contract, session and navigation', async ({ page }) => {
+  let requestBody: unknown;
+  await page.route('**/api/registration/', async (route) => {
+    requestBody = route.request().postDataJSON();
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({
+        token: 'registration-token',
+        user_id: 14,
+        email: 'ada@example.com',
+        fullname: 'Ada Lovelace',
+      }),
+    });
+  });
+  await page.goto('/register');
+  await page.getByLabel('Full name').fill('Ada Lovelace');
+  await page.getByLabel('Email').fill('ada@example.com');
+  await page.getByLabel('Password', { exact: true }).fill('long-enough');
+  await page.getByLabel('Confirm password', { exact: true }).fill('long-enough');
+  await page.getByRole('checkbox', { name: /I have read and agree/i }).check();
+  await page.getByRole('button', { name: 'Sign up', exact: true }).click();
+
+  await expect(page).toHaveURL(/\/dashboard$/);
+  expect(requestBody).toEqual({
+    fullname: 'Ada Lovelace',
+    email: 'ada@example.com',
+    password: 'long-enough',
+    repeated_password: 'long-enough',
+  });
+  expect(await page.evaluate(() => localStorage.getItem('auth-token'))).toBe('registration-token');
+});
+
+test('registration API validation messages are announced', async ({ page }) => {
+  await page.route('**/api/registration/', (route) => route.fulfill({
+    status: 400,
+    contentType: 'application/json',
+    body: JSON.stringify({ email: ['Email already exists'] }),
+  }));
+  await page.goto('/register');
+  await page.getByLabel('Full name').fill('Ada Lovelace');
+  await page.getByLabel('Email').fill('ada@example.com');
+  await page.getByLabel('Password', { exact: true }).fill('long-enough');
+  await page.getByLabel('Confirm password', { exact: true }).fill('long-enough');
+  await page.getByRole('checkbox', { name: /I have read and agree/i }).check();
+  await page.getByRole('button', { name: 'Sign up', exact: true }).click();
+
+  await expect(page.getByRole('alert')).toContainText('Email already exists');
+  await expect(page).toHaveURL(/\/register$/);
+});

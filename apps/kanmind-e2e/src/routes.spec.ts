@@ -7,9 +7,10 @@ test('guarded migration pages redirect guests to login', async ({ page }) => {
   await expect(page).toHaveURL(/\/login$/);
 });
 
-test('registration is a public, explicit migration placeholder', async ({ page }) => {
+test('registration is a public Angular page', async ({ page }) => {
   await page.goto('/register');
-  await expect(page.getByRole('heading', { name: 'Registration migration' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Sign up' })).toBeVisible();
+  await expect(page.getByRole('link', { name: /Log in/i })).toHaveAttribute('href', '/login');
 });
 
 test('privacy and imprint remain reachable from the login footer', async ({ page }) => {

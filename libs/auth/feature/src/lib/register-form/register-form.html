@@ -1,0 +1,90 @@
+<form class="std_form d_flex_cs_gl f_d_c" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+  <h1 class="font_prime_color d_flex_cs_gl w_full">Sign up</h1>
+  <p class="font_white_color d_flex_cs_gl w_full">Your journey to better organization starts here</p>
+
+  <div class="form_group_w_icon_wo_label w_full" [attr.error]="showError('fullname')">
+    <img src="/assets/icons/face_icon.svg" alt="" aria-hidden="true">
+    <input type="text" id="fullname" formControlName="fullname" autocomplete="name"
+      [attr.aria-invalid]="showError('fullname')" [attr.aria-describedby]="showError('fullname') ? 'fullname-error' : null">
+    <label for="fullname">Full name</label>
+    <p class="error_label" id="fullname-error">Enter your full name (e.g., Max Mustermann).</p>
+  </div>
+
+  <div class="form_group_w_icon_wo_label w_full" [attr.error]="showError('email')">
+    <img src="/assets/icons/mail_icon.svg" alt="" aria-hidden="true">
+    <input type="email" id="registration-email" formControlName="email" autocomplete="email"
+      [attr.aria-invalid]="showError('email')" [attr.aria-describedby]="showError('email') ? 'registration-email-error' : null">
+    <label for="registration-email">Email</label>
+    <p class="error_label" id="registration-email-error">Please enter a valid email address.</p>
+  </div>
+
+  <div class="form_group_w_icon_wo_label w_full" [attr.error]="showError('password')">
+    <img src="/assets/icons/password_icon.svg" alt="" aria-hidden="true">
+    <input [type]="passwordVisible() ? 'text' : 'password'" id="registration-password" formControlName="password"
+      autocomplete="new-password" [attr.aria-invalid]="showError('password')"
+      [attr.aria-describedby]="showError('password') ? 'registration-password-error' : null">
+    <label for="registration-password">Password</label>
+    <button class="password-toggle" type="button" (click)="togglePassword('password')"
+      [attr.aria-label]="passwordVisible() ? 'Hide password' : 'Show password'">
+      <img [src]="passwordVisible() ? '/assets/icons/pw_visibility_off.svg' : '/assets/icons/pw_visibility.svg'" alt="">
+    </button>
+    <p class="error_label" id="registration-password-error">Password must be at least 8 characters long.</p>
+  </div>
+
+  <div class="form_group_w_icon_wo_label w_full" [attr.error]="showError('repeatedPassword')">
+    <img src="/assets/icons/password_icon.svg" alt="" aria-hidden="true">
+    <input [type]="repeatedPasswordVisible() ? 'text' : 'password'" id="repeated-password"
+      formControlName="repeatedPassword" autocomplete="new-password"
+      [attr.aria-invalid]="showError('repeatedPassword')"
+      [attr.aria-describedby]="showError('repeatedPassword') ? 'repeated-password-error' : null">
+    <label for="repeated-password">Confirm password</label>
+    <button class="password-toggle" type="button" (click)="togglePassword('repeatedPassword')"
+      [attr.aria-label]="repeatedPasswordVisible() ? 'Hide confirm password' : 'Show confirm password'">
+      <img [src]="repeatedPasswordVisible() ? '/assets/icons/pw_visibility_off.svg' : '/assets/icons/pw_visibility.svg'" alt="">
+    </button>
+    <p class="error_label" id="repeated-password-error">Passwords do not match.</p>
+  </div>
+
+  <div class="form_group_checkbox w_full custom_checkbox d_flex_ss_gs f_d_c"
+    [attr.error]="showError('privacyAccepted')">
+    <div class="privacy-row d_flex_cs_gs">
+      <input class="privacy-checkbox" type="checkbox" id="privacy-policy-checkbox"
+        formControlName="privacyAccepted" [attr.aria-invalid]="showError('privacyAccepted')"
+        [attr.aria-describedby]="showError('privacyAccepted') ? 'privacy-error' : null">
+      <label for="privacy-policy-checkbox" class="font_white_color d_flex_cs_gs">
+        <span class="checkbox_icon" aria-hidden="true"></span>
+        <span>I have read and agree to the</span>
+      </label>
+      <a class="link_prime" routerLink="/privacy">Privacy Policy</a>
+    </div>
+    <p class="error_label w_full" id="privacy-error">Please accept the privacy policy.</p>
+  </div>
+
+  @if (error(); as registrationError) {
+    <div class="registration-error" role="alert" aria-live="assertive">
+      @switch (registrationError.kind) {
+        @case ('validation') {
+          <ul>
+            @for (message of registrationError.messages; track message) {
+              <li>{{ message }}</li>
+            }
+          </ul>
+        }
+        @case ('network') { The server is unavailable. Please try again. }
+        @case ('unexpected') { Something went wrong. Please try again. }
+      }
+    </div>
+  }
+
+  <div class="d_flex_cc_gl f_d_r_resp_c w_full">
+    <button type="submit" class="std_btn btn_prime pad_s d_flex_cc_gs" [disabled]="loading()">
+      {{ loading() ? 'Signing up…' : 'Sign up' }}
+    </button>
+  </div>
+
+  <div class="d_flex_cc_gl f_d_r_resp_c w_full">
+    <p class="font_white_color">Already have an account?</p>
+    <a routerLink="/login" class="link_prime d_flex_cc_gm">Log in</a>
+  </div>
+  <p class="sr-only" role="status" aria-live="polite">{{ loading() ? 'Registration in progress' : '' }}</p>
+</form>

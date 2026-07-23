@@ -9,7 +9,7 @@ import { AuthStore } from './auth.store';
 describe('AuthStore', () => {
   const storage = { read: vi.fn(), write: vi.fn(), clear: vi.fn(), token: vi.fn() };
   const router = { navigate: vi.fn() };
-  const api = { login: vi.fn() };
+  const api = { login: vi.fn(), register: vi.fn() };
 
   beforeEach(() => {
     vi.clearAllMocks(); storage.read.mockReturnValue(null);
@@ -48,6 +48,53 @@ describe('AuthStore', () => {
     const store = TestBed.inject(AuthStore);
     store.login({ email: 'a@b.test', password: 'bad' });
     expect(store.error()).toBe('invalidCredentials');
+    expect(store.status()).toBe('error');
+  });
+
+  it('registers, persists the session and navigates to the dashboard', () => {
+    const request = new Subject<LoginResponseDto>();
+    api.register.mockReturnValue(request);
+    const store = TestBed.inject(AuthStore);
+    const command = {
+      fullname: 'Ada Lovelace',
+      email: 'ada@example.com',
+      password: 'long-enough',
+      repeated_password: 'long-enough',
+    };
+
+    store.register(command);
+    expect(store.status()).toBe('loading');
+    request.next({ token: 'new', user_id: 8, email: command.email, fullname: command.fullname });
+    request.complete();
+
+    expect(api.register).toHaveBeenCalledWith(command);
+    expect(storage.write).toHaveBeenCalledWith({
+      token: 'new',
+      userId: 8,
+      email: command.email,
+      fullName: command.fullname,
+    });
+    expect(router.navigate).toHaveBeenCalledWith(['/dashboard']);
+  });
+
+  it('exposes registration validation messages without transport details', () => {
+    api.register.mockReturnValue(throwError(() => new HttpErrorResponse({
+      status: 400,
+      error: { email: ['Email already exists'] },
+    })));
+    const store = TestBed.inject(AuthStore);
+
+    store.register({
+      fullname: 'Ada Lovelace',
+      email: 'ada@example.com',
+      password: 'long-enough',
+      repeated_password: 'long-enough',
+    });
+
+    expect(store.registrationError()).toEqual({
+      kind: 'validation',
+      messages: ['Email already exists'],
+    });
     expect(store.status()).toBe('error');
   });
 });
