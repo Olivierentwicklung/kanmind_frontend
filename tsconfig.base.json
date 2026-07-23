@@ -29,6 +29,15 @@
       ],
       "@kanmind/legal/feature": [
         "./libs/legal/feature/src/index.ts"
+      ],
+      "@kanmind/dashboard/data-access": [
+        "./libs/dashboard/data-access/src/index.ts"
+      ],
+      "@kanmind/dashboard/domain": [
+        "./libs/dashboard/domain/src/index.ts"
+      ],
+      "@kanmind/dashboard/feature": [
+        "./libs/dashboard/feature/src/index.ts"
       ]
     }
   },

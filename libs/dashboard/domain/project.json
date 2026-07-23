@@ -1,0 +1,13 @@
+{
+  "name": "dashboard-domain",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/dashboard/domain/src",
+  "prefix": "lib",
+  "projectType": "library",
+  "tags": ["scope:dashboard", "type:domain"],
+  "targets": {
+    "lint": {
+      "executor": "@nx/eslint:lint"
+    }
+  }
+}
