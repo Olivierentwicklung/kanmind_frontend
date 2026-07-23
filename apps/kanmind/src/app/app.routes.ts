@@ -31,7 +31,11 @@ export const appRoutes: Route[] = [
     canActivate: [authGuard],
     loadChildren: () => import('@kanmind/boards/feature').then((m) => m.BOARDS_ROUTES),
   },
-  { path: 'board', component: MigrationPlaceholder, canActivate: [authGuard], data: { title: 'Board migration' } },
+  {
+    path: 'board',
+    canActivate: [authGuard],
+    loadChildren: () => import('@kanmind/boards/feature').then((m) => m.BOARD_ROUTES),
+  },
   ...legacyRedirects,
   { path: '**', component: NotFound, title: 'Page not found | KanMind' },
 ];

@@ -50,4 +50,43 @@ describe('BoardsApi', () => {
     api.deleteBoard(7).subscribe();
     expect(http.expectOne('/api/boards/7/').request.method).toBe('DELETE');
   });
+
+  it('creates, updates and deletes tasks with the expected payloads', () => {
+    const task = {
+      board: 7,
+      title: 'Angular parity',
+      description: 'Protect the migration',
+      status: 'review' as const,
+      priority: 'high' as const,
+      assignee_id: null,
+      reviewer_id: 43,
+      due_date: '2099-09-30',
+    };
+
+    api.createTask(task).subscribe();
+    const create = http.expectOne('/api/tasks/');
+    expect(create.request.method).toBe('POST');
+    expect(create.request.body).toEqual(task);
+
+    api.updateTask(21, { status: 'done' }).subscribe();
+    const update = http.expectOne('/api/tasks/21/');
+    expect(update.request.method).toBe('PATCH');
+    expect(update.request.body).toEqual({ status: 'done' });
+
+    api.deleteTask(21).subscribe();
+    expect(http.expectOne('/api/tasks/21/').request.method).toBe('DELETE');
+  });
+
+  it('loads, creates and deletes task comments', () => {
+    api.getTaskComments(21).subscribe();
+    expect(http.expectOne('/api/tasks/21/comments/').request.method).toBe('GET');
+
+    api.createTaskComment(21, 'Migration note').subscribe();
+    const create = http.expectOne('/api/tasks/21/comments/');
+    expect(create.request.method).toBe('POST');
+    expect(create.request.body).toEqual({ content: 'Migration note' });
+
+    api.deleteTaskComment(21, 31).subscribe();
+    expect(http.expectOne('/api/tasks/21/comments/31/').request.method).toBe('DELETE');
+  });
 });
