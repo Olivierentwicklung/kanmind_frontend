@@ -1,0 +1,42 @@
+@if (boards().length > 0) {
+  <ul class="board-list" aria-label="Boards">
+    @for (board of boards(); track board.id) {
+      <li class="card board-card">
+        <button
+          type="button"
+          class="board-open"
+          [attr.aria-label]="'Open ' + board.title"
+          (click)="boardSelected.emit(board.id)"
+        >
+          <span class="board-title">{{ board.title }}</span>
+          <span class="metric">
+            <img src="/assets/icons/member_icon.svg" alt="">
+            {{ board.memberCount }} Members
+          </span>
+          <span class="metric">
+            <img src="/assets/icons/ticket_icon.svg" alt="">
+            {{ board.ticketCount }} Tickets
+          </span>
+          <span class="metric">
+            <img src="/assets/icons/assign_icon.svg" alt="">
+            {{ board.tasksToDoCount }} Tasks To-do
+          </span>
+          <span class="metric">
+            <span class="priority-badge" aria-hidden="true"></span>
+            {{ board.highPriorityTaskCount }} High Prio
+          </span>
+        </button>
+        <button
+          type="button"
+          class="settings-button"
+          [attr.aria-label]="'Settings for ' + board.title"
+          (click)="settingsRequested.emit(board.id)"
+        >
+          <img src="/assets/icons/settings.svg" alt="">
+        </button>
+      </li>
+    }
+  </ul>
+} @else {
+  <p class="empty-state font_prime_color" aria-live="polite">No boards available</p>
+}

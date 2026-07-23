@@ -1,0 +1,105 @@
+<header class="main_header w_full">
+  <a routerLink="/dashboard" aria-label="KanMind dashboard">
+    <img src="/assets/icons/logo_icon.svg" alt="KanMind">
+  </a>
+  <nav class="header-actions" aria-label="Primary">
+    <a routerLink="/dashboard" class="header-link">
+      <img src="/assets/icons/dashboard.svg" alt="">
+      Dashboard
+    </a>
+    <span class="profile_circle" [attr.aria-label]="'Signed in as ' + (authStore.session()?.fullName ?? '')">
+      {{ (authStore.session()?.fullName ?? '').slice(0, 1) }}
+    </span>
+    <button type="button" class="header-link" (click)="authStore.logout()">
+      <img src="/assets/icons/logout.svg" alt="">
+      Log out
+    </button>
+  </nav>
+</header>
+
+<main class="boards-main w_full">
+  <nav class="breadcrumbs" aria-label="Breadcrumb">
+    <a routerLink="/dashboard" class="link_secondary">Dashboard</a>
+    <span aria-hidden="true">/</span>
+    <span aria-current="page">Boards</span>
+  </nav>
+
+  <section class="boards-content" aria-labelledby="boards-heading">
+    <header class="page-header">
+      <h1 id="boards-heading" class="font_white_color">Your Boards</h1>
+      <div class="search-field">
+        <img src="/assets/icons/search_yellow.svg" alt="">
+        <label for="board-search">Search boards</label>
+        <input
+          id="board-search"
+          type="search"
+          placeholder="Search"
+          [value]="store.searchQuery()"
+          (input)="store.applySearch($any($event.target).value)"
+        >
+      </div>
+      <button type="button" class="std_btn btn_prime add-button" (click)="store.openCreateBoard()">
+        <img src="/assets/icons/add_black.svg" alt="">
+        <span>Create board</span>
+      </button>
+    </header>
+
+    @if (store.status() === 'idle' || store.status() === 'loading') {
+      <div class="page-state" aria-live="polite">
+        <span class="spinner" aria-hidden="true"></span>
+        <p>Loading boards…</p>
+      </div>
+    } @else if (store.status() === 'error') {
+      <div class="page-state" role="alert">
+        <h2 class="font_prime_color">Boards unavailable</h2>
+        <p>We could not load your boards. Please check your connection and try again.</p>
+        <button type="button" class="std_btn btn_prime" (click)="store.loadBoards()">Try again</button>
+      </div>
+    } @else {
+      <lib-board-list
+        [boards]="store.visibleBoards()"
+        (boardSelected)="openBoard($event)"
+        (settingsRequested)="store.openBoardSettings($event)"
+      />
+    }
+
+    @if (store.mutationStatus() === 'error') {
+      <p class="operation-error" role="alert">
+        The board change could not be saved. Please try again.
+      </p>
+    }
+  </section>
+</main>
+
+<footer class="main_footer w_full">
+  <nav class="footer-links" aria-label="Legal">
+    <a routerLink="/privacy" class="link">Privacy Policy</a>
+    <a routerLink="/imprint" class="link">Imprint</a>
+  </nav>
+</footer>
+
+@if (store.dialog() === 'create') {
+  <lib-create-board-dialog
+    [members]="store.createMembers()"
+    [memberStatus]="store.memberStatus()"
+    [mutationStatus]="store.mutationStatus()"
+    [memberError]="store.memberError()"
+    (closed)="store.closeDialog()"
+    (memberInvited)="store.inviteCreateMember($event)"
+    (memberRemoved)="store.removeCreateMember($event)"
+    (submitted)="store.createBoard($event)"
+  />
+} @else if (store.dialog() === 'settings') {
+  <lib-board-settings-dialog
+    [board]="store.selectedBoard()"
+    [detailStatus]="store.detailStatus()"
+    [memberStatus]="store.memberStatus()"
+    [mutationStatus]="store.mutationStatus()"
+    [memberError]="store.memberError()"
+    (closed)="store.closeDialog()"
+    (memberInvited)="store.inviteBoardMember($event)"
+    (memberRemoved)="store.removeBoardMember($event)"
+    (renamed)="store.renameBoard($event)"
+    (deleted)="store.deleteSelectedBoard()"
+  />
+}

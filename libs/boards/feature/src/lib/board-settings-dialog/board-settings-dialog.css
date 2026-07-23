@@ -1,0 +1,142 @@
+:host {
+  position: fixed;
+  z-index: 20;
+}
+
+.dialog-backdrop {
+  align-items: center;
+  background: rgb(0 0 0 / 65%);
+  display: flex;
+  inset: 0;
+  justify-content: center;
+  padding: 24px;
+  position: fixed;
+}
+
+.dialog-card {
+  color: var(--font_white_color);
+  max-height: calc(100vh - 48px);
+  max-width: 720px;
+  overflow: auto;
+  padding: 32px;
+  width: 100%;
+}
+
+.dialog-header,
+.section-heading,
+.invite-row,
+.title-edit-row,
+.delete-section,
+.confirm-delete,
+li {
+  align-items: center;
+  display: flex;
+  gap: 16px;
+}
+
+.dialog-header,
+.section-heading,
+li {
+  justify-content: space-between;
+}
+
+.icon-button {
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  padding: 8px;
+}
+
+.icon-button img {
+  height: 24px;
+  width: 24px;
+}
+
+.title-section,
+.members-section,
+.added-members,
+.delete-section {
+  border-bottom: 1px solid var(--btn-secondary-hover-color);
+  padding: 20px 0;
+}
+
+.field,
+.members-section,
+.added-members,
+.dialog-state {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.invite-row .field,
+.title-edit-row input {
+  flex: 1;
+}
+
+input {
+  box-sizing: border-box;
+  width: 100%;
+}
+
+ul {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.delete-section {
+  align-items: flex-start;
+  border-bottom: 0;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+.delete-section .std_btn {
+  align-items: center;
+  display: flex;
+  gap: 8px;
+}
+
+.delete-section img {
+  height: 22px;
+  width: 22px;
+}
+
+.confirm-delete {
+  align-items: stretch;
+  flex-direction: column;
+}
+
+.error {
+  color: var(--error-color, #ff8b8b);
+  margin: 0;
+}
+
+.dialog-state {
+  align-items: center;
+  justify-content: center;
+  min-height: 240px;
+  text-align: center;
+}
+
+button:focus-visible,
+input:focus-visible {
+  outline: 3px solid var(--font-prime-color);
+  outline-offset: 3px;
+}
+
+@media (max-width: 560px) {
+  .dialog-card {
+    padding: 20px;
+  }
+
+  .invite-row,
+  .delete-section {
+    align-items: stretch;
+    flex-direction: column;
+  }
+}

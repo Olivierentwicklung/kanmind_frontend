@@ -1,0 +1,155 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  width: 100%;
+}
+
+.header-actions,
+.footer-links,
+.header-link,
+.page-header,
+.search-field,
+.add-button {
+  align-items: center;
+  display: flex;
+}
+
+.header-actions,
+.footer-links {
+  gap: 20px;
+}
+
+.header-link {
+  background: transparent;
+  border: 0;
+  color: var(--link-color);
+  cursor: pointer;
+  font: inherit;
+  gap: 8px;
+  padding: 8px;
+  text-decoration: none;
+}
+
+.header-link img {
+  height: 20px;
+  width: 20px;
+}
+
+.boards-main {
+  align-items: stretch;
+  flex: 1;
+  padding: 40px clamp(24px, 5vw, 80px);
+}
+
+.breadcrumbs {
+  color: var(--font_sec_color);
+  display: flex;
+  gap: 8px;
+  margin-bottom: 28px;
+}
+
+.boards-content {
+  width: 100%;
+}
+
+.page-header {
+  flex-wrap: wrap;
+  gap: 24px;
+  justify-content: space-between;
+  margin-bottom: 40px;
+}
+
+.page-header h1 {
+  margin: 0;
+}
+
+.search-field {
+  background: var(--form-input-bg-color);
+  border: var(--form-input-border);
+  border-radius: var(--form-input-rad);
+  flex: 1;
+  max-width: 480px;
+  min-width: 240px;
+  padding: 0 12px;
+}
+
+.search-field img {
+  height: 24px;
+  width: 24px;
+}
+
+.search-field label {
+  height: 1px;
+  overflow: hidden;
+  position: absolute;
+  width: 1px;
+}
+
+.search-field input {
+  background: transparent;
+  border: 0;
+  box-sizing: border-box;
+  color: var(--font_white_color);
+  flex: 1;
+  font: inherit;
+  padding: 12px;
+}
+
+.add-button {
+  gap: 8px;
+}
+
+.add-button img {
+  height: 22px;
+  width: 22px;
+}
+
+.page-state {
+  align-items: center;
+  color: var(--font_white_color);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  justify-content: center;
+  min-height: 40vh;
+  text-align: center;
+}
+
+.operation-error {
+  color: var(--error-color, #ff8b8b);
+  margin-top: 24px;
+  text-align: center;
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible {
+  outline: 3px solid var(--font-prime-color);
+  outline-offset: 3px;
+}
+
+@media (max-width: 620px) {
+  .boards-main {
+    padding: 28px 16px;
+  }
+
+  .header-actions {
+    gap: 4px;
+  }
+
+  .header-link {
+    font-size: 0;
+  }
+
+  .header-link img {
+    height: 24px;
+    width: 24px;
+  }
+
+  .search-field {
+    max-width: none;
+    order: 3;
+    width: 100%;
+  }
+}

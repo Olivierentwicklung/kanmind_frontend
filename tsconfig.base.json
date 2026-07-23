@@ -38,6 +38,15 @@
       ],
       "@kanmind/dashboard/feature": [
         "./libs/dashboard/feature/src/index.ts"
+      ],
+      "@kanmind/boards/data-access": [
+        "./libs/boards/data-access/src/index.ts"
+      ],
+      "@kanmind/boards/domain": [
+        "./libs/boards/domain/src/index.ts"
+      ],
+      "@kanmind/boards/feature": [
+        "./libs/boards/feature/src/index.ts"
       ]
     }
   },
