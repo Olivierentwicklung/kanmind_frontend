@@ -2,35 +2,6 @@ import { Route } from '@angular/router';
 import { authGuard, landingRedirect } from '@kanmind/auth/domain';
 import { NotFound } from './not-found';
 
-const compatibilityRedirects: Route[] = [
-  { path: 'pages/auth/login.html', redirectTo: 'login', pathMatch: 'full' },
-  {
-    path: 'pages/auth/register.html',
-    redirectTo: 'register',
-    pathMatch: 'full',
-  },
-  {
-    path: 'pages/dashboard/index.html',
-    redirectTo: 'dashboard',
-    pathMatch: 'full',
-  },
-  { path: 'pages/dashboard', redirectTo: 'dashboard', pathMatch: 'full' },
-  { path: 'pages/boards/index.html', redirectTo: 'boards', pathMatch: 'full' },
-  { path: 'pages/boards', redirectTo: 'boards', pathMatch: 'full' },
-  { path: 'pages/board/index.html', redirectTo: 'board', pathMatch: 'full' },
-  { path: 'pages/board', redirectTo: 'board', pathMatch: 'full' },
-  {
-    path: 'pages/privacy/index.html',
-    redirectTo: 'privacy',
-    pathMatch: 'full',
-  },
-  {
-    path: 'pages/imprint/index.html',
-    redirectTo: 'imprint',
-    pathMatch: 'full',
-  },
-];
-
 export const appRoutes: Route[] = [
   { path: '', pathMatch: 'full', redirectTo: landingRedirect },
   {
@@ -66,7 +37,6 @@ export const appRoutes: Route[] = [
     loadChildren: () =>
       import('@kanmind/boards/feature').then((m) => m.BOARD_ROUTES),
   },
-  ...compatibilityRedirects,
   {
     path: '**',
     loadComponent: () => NotFound,
