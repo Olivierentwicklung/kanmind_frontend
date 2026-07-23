@@ -4,6 +4,9 @@
     role="dialog"
     aria-modal="true"
     [attr.aria-labelledby]="'task-form-heading'"
+    tabindex="-1"
+    libDialogFocus
+    (escapePressed)="closed.emit()"
   >
     <header>
       <h2 id="task-form-heading" class="font_prime_color">
@@ -11,12 +14,22 @@
       </h2>
       <div>
         @if (mode() === 'edit') {
-          <button type="button" class="icon-button" aria-label="Delete task" (click)="deleted.emit()">
-            <img src="/assets/icons/delete.svg" alt="">
-          </button>
+        <button
+          type="button"
+          class="icon-button"
+          aria-label="Delete task"
+          (click)="deleted.emit()"
+        >
+          <img src="/assets/icons/delete.svg" alt="" />
+        </button>
         }
-        <button type="button" class="icon-button" aria-label="Close task form" (click)="closed.emit()">
-          <img src="/assets/icons/close_yellow.svg" alt="">
+        <button
+          type="button"
+          class="icon-button"
+          aria-label="Close task form"
+          (click)="closed.emit()"
+        >
+          <img src="/assets/icons/close_yellow.svg" alt="" />
         </button>
       </div>
     </header>
@@ -32,13 +45,23 @@
         </select>
       </label>
 
-      <label>
-        Title
-        <input type="text" formControlName="title">
-        @if ((submitted() || form.controls.title.touched) && form.controls.title.invalid) {
-          <span class="field-error">Title must be at least 3 characters long.</span>
+      <label for="task-title">Title</label>
+      <div>
+        <input
+          id="task-title"
+          type="text"
+          formControlName="title"
+          data-dialog-initial-focus
+          [attr.aria-invalid]="(submitted() || form.controls.title.touched) && form.controls.title.invalid"
+          [attr.aria-describedby]="(submitted() || form.controls.title.touched) && form.controls.title.invalid ? 'task-title-error' : null"
+        />
+        @if ((submitted() || form.controls.title.touched) &&
+        form.controls.title.invalid) {
+        <span id="task-title-error" class="field-error"
+          >Title must be at least 3 characters long.</span
+        >
         }
-      </label>
+      </div>
 
       <label>
         Description
@@ -51,7 +74,7 @@
           <select formControlName="assigneeId">
             <option [ngValue]="null">Unassigned</option>
             @for (member of members(); track member.id) {
-              <option [ngValue]="member.id">{{ member.fullName }}</option>
+            <option [ngValue]="member.id">{{ member.fullName }}</option>
             }
           </select>
         </label>
@@ -60,17 +83,26 @@
           <select formControlName="reviewerId">
             <option [ngValue]="null">Unassigned</option>
             @for (member of members(); track member.id) {
-              <option [ngValue]="member.id">{{ member.fullName }}</option>
+            <option [ngValue]="member.id">{{ member.fullName }}</option>
             }
           </select>
         </label>
-        <label>
-          Due date
-          <input type="date" formControlName="dueDate">
-          @if ((submitted() || form.controls.dueDate.touched) && form.controls.dueDate.invalid) {
-            <span class="field-error">Due date is required.</span>
+        <div>
+          <label for="task-due-date">Due date</label>
+          <input
+            id="task-due-date"
+            type="date"
+            formControlName="dueDate"
+            [attr.aria-invalid]="(submitted() || form.controls.dueDate.touched) && form.controls.dueDate.invalid"
+            [attr.aria-describedby]="(submitted() || form.controls.dueDate.touched) && form.controls.dueDate.invalid ? 'task-due-date-error' : null"
+          />
+          @if ((submitted() || form.controls.dueDate.touched) &&
+          form.controls.dueDate.invalid) {
+          <span id="task-due-date-error" class="field-error"
+            >Due date is required.</span
+          >
           }
-        </label>
+        </div>
         <label>
           Priority
           <select formControlName="priority">
@@ -82,11 +114,15 @@
       </div>
 
       @if (mutationStatus() === 'error') {
-        <p role="alert" class="field-error">The task could not be saved. Please try again.</p>
+      <p role="alert" class="field-error">
+        The task could not be saved. Please try again.
+      </p>
       }
 
       <footer>
-        <button type="button" class="std_btn btn_third" (click)="closed.emit()">Cancel</button>
+        <button type="button" class="std_btn btn_third" (click)="closed.emit()">
+          Cancel
+        </button>
         <button
           type="submit"
           class="std_btn btn_prime"

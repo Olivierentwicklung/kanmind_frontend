@@ -6,7 +6,12 @@ import {
   output,
   signal,
 } from '@angular/core';
-import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import {
+  FormControl,
+  FormGroup,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
 import {
   BoardMember,
   BoardTask,
@@ -15,10 +20,11 @@ import {
   BoardsMutationStatus,
   SaveBoardTaskCommand,
 } from '@kanmind/boards/domain';
+import { DialogFocusDirective } from '../dialog-focus/dialog-focus.directive';
 
 @Component({
   selector: 'lib-task-form-dialog',
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, DialogFocusDirective],
   templateUrl: './task-form-dialog.html',
   styleUrl: './task-form-dialog.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -38,7 +44,11 @@ export class TaskFormDialog implements OnInit {
   readonly form = new FormGroup({
     title: new FormControl('', {
       nonNullable: true,
-      validators: [Validators.required, Validators.minLength(3), Validators.maxLength(64)],
+      validators: [
+        Validators.required,
+        Validators.minLength(3),
+        Validators.maxLength(64),
+      ],
     }),
     description: new FormControl('', { nonNullable: true }),
     status: new FormControl<BoardTaskStatus>('to-do', {

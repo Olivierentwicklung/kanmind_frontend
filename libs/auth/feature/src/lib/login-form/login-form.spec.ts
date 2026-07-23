@@ -21,19 +21,33 @@ describe('LoginForm', () => {
     });
 
     fireEvent.click(screen.getByRole('button', { name: 'Log in' }));
+    await fixture.whenStable();
 
     expect(submitted).not.toHaveBeenCalled();
     expect(fixture.componentInstance.showError('email')).toBe(true);
     expect(fixture.componentInstance.showError('password')).toBe(true);
+    expect(screen.getByLabelText('Email').getAttribute('aria-invalid')).toBe(
+      'true',
+    );
+    expect(
+      screen.getByLabelText('Email').getAttribute('aria-describedby'),
+    ).toBe('email-error');
+    expect(screen.getByLabelText('Password').getAttribute('aria-invalid')).toBe(
+      'true',
+    );
   });
 
   it('toggles password visibility', async () => {
-    const { fixture } = await render(LoginForm, { providers: [provideRouter([])] });
+    const { fixture } = await render(LoginForm, {
+      providers: [provideRouter([])],
+    });
 
     fireEvent.click(screen.getByRole('button', { name: 'Show password' }));
     await fixture.whenStable();
 
-    expect((screen.getByLabelText('Password') as HTMLInputElement).type).toBe('text');
+    expect((screen.getByLabelText('Password') as HTMLInputElement).type).toBe(
+      'text',
+    );
     expect(screen.getByRole('button', { name: 'Hide password' })).toBeTruthy();
   });
 
@@ -45,8 +59,12 @@ describe('LoginForm', () => {
       bindings: [outputBinding('submitted', submitted)],
     });
 
-    fireEvent.input(screen.getByRole('textbox', { name: 'Email' }), { target: { value: command.email } });
-    fireEvent.input(screen.getByLabelText('Password'), { target: { value: command.password } });
+    fireEvent.input(screen.getByRole('textbox', { name: 'Email' }), {
+      target: { value: command.email },
+    });
+    fireEvent.input(screen.getByLabelText('Password'), {
+      target: { value: command.password },
+    });
     fireEvent.click(screen.getByRole('button', { name: 'Log in' }));
 
     expect(submitted).toHaveBeenCalledWith(command);
@@ -59,7 +77,11 @@ describe('LoginForm', () => {
     });
     await fixture.whenStable();
 
-    expect(screen.getAllByRole('button').filter((button) => (button as HTMLButtonElement).disabled)).toHaveLength(2);
+    expect(
+      screen
+        .getAllByRole('button')
+        .filter((button) => (button as HTMLButtonElement).disabled),
+    ).toHaveLength(2);
     expect(screen.getByText(/Logging in/)).toBeTruthy();
   });
 });

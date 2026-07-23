@@ -4,10 +4,10 @@ export interface LoginCommand {
 }
 
 export interface RegistrationCommand {
-  fullname: string;
+  fullName: string;
   email: string;
   password: string;
-  repeated_password: string;
+  repeatedPassword: string;
 }
 
 export interface AuthSession {

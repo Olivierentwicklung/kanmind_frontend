@@ -3,9 +3,9 @@ import {
   Component,
   effect,
   inject,
-  OnInit,
+  input,
 } from '@angular/core';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { AuthStore } from '@kanmind/auth/domain';
 import { BoardStore } from '@kanmind/boards/domain';
 import { AppShell } from '@kanmind/shared/ui';
@@ -29,14 +29,27 @@ import { TaskFormDialog } from '../task-form-dialog/task-form-dialog';
   styleUrl: './board-page.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class BoardPage implements OnInit {
+export class BoardPage {
+  readonly id = input<string>();
+  readonly task_id = input<string>();
   readonly store = inject(BoardStore);
   readonly authStore = inject(AuthStore);
-  private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
-  private requestedTaskOpened = false;
+  private requestedTaskId: number | null = null;
 
   constructor() {
+    effect(() => {
+      const boardId = this.toPositiveInteger(this.id());
+      this.requestedTaskId = null;
+
+      if (boardId === null) {
+        void this.router.navigate(['/boards']);
+        return;
+      }
+
+      this.store.loadBoard(boardId);
+    });
+
     effect(() => {
       if (this.store.deleted()) {
         void this.router.navigate(['/boards']);
@@ -44,26 +57,23 @@ export class BoardPage implements OnInit {
     });
 
     effect(() => {
-      const taskId = Number(this.route.snapshot.queryParamMap.get('task_id'));
+      const taskId = this.toPositiveInteger(this.task_id());
       if (
-        !this.requestedTaskOpened &&
-        Number.isInteger(taskId) &&
-        taskId > 0 &&
+        taskId !== null &&
+        this.requestedTaskId !== taskId &&
         this.store.status() === 'success' &&
         this.store.board()?.tasks.some((task) => task.id === taskId)
       ) {
-        this.requestedTaskOpened = true;
+        this.requestedTaskId = taskId;
         this.store.openTask(taskId);
       }
     });
   }
 
-  ngOnInit(): void {
-    const boardId = Number(this.route.snapshot.queryParamMap.get('id'));
-    if (Number.isInteger(boardId) && boardId > 0) {
-      this.store.loadBoard(boardId);
-    } else {
-      void this.router.navigate(['/boards']);
-    }
+  private toPositiveInteger(value: string | undefined): number | null {
+    const parsedValue = Number(value);
+    return Number.isInteger(parsedValue) && parsedValue > 0
+      ? parsedValue
+      : null;
   }
 }

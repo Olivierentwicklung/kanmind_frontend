@@ -19,14 +19,20 @@
 
 .privacy-row {
   flex-wrap: wrap;
+  position: relative;
 }
 
 .custom_checkbox input.privacy-checkbox {
   display: block;
   position: absolute;
-  width: 1px;
-  height: 1px;
+  width: 24px;
+  height: 24px;
+  margin: 0;
   opacity: 0;
+  overflow: visible;
+  clip: auto;
+  cursor: pointer;
+  z-index: 1;
 }
 
 .privacy-checkbox:focus-visible + label .checkbox_icon {
@@ -66,5 +72,5 @@
 
 button:disabled {
   cursor: wait;
-  opacity: .65;
+  opacity: 0.65;
 }

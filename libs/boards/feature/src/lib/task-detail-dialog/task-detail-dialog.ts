@@ -1,4 +1,9 @@
-import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  input,
+  output,
+} from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import {
@@ -8,10 +13,11 @@ import {
   BoardsMutationStatus,
   TaskComment,
 } from '@kanmind/boards/domain';
+import { DialogFocusDirective } from '../dialog-focus/dialog-focus.directive';
 
 @Component({
   selector: 'lib-task-detail-dialog',
-  imports: [DatePipe, ReactiveFormsModule],
+  imports: [DatePipe, ReactiveFormsModule, DialogFocusDirective],
   templateUrl: './task-detail-dialog.html',
   styleUrl: './task-detail-dialog.css',
   changeDetection: ChangeDetectionStrategy.OnPush,

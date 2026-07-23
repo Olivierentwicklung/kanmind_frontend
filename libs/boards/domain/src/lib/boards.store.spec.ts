@@ -1,6 +1,5 @@
-import { HttpErrorResponse } from '@angular/common/http';
 import { TestBed } from '@angular/core/testing';
-import { BoardsApi } from '@kanmind/boards/data-access';
+import { BoardsRepository } from '@kanmind/boards/data-access';
 import { Subject, of, throwError } from 'rxjs';
 import { vi } from 'vitest';
 import { BoardsStore } from './boards.store';
@@ -10,27 +9,27 @@ describe('BoardsStore', () => {
     {
       id: 7,
       title: 'Migration Board',
-      owner_id: 42,
-      member_count: 5,
-      ticket_count: 3,
-      tasks_to_do_count: 1,
-      tasks_high_prio_count: 1,
+      ownerId: 42,
+      memberCount: 5,
+      ticketCount: 3,
+      tasksToDoCount: 1,
+      highPriorityTaskCount: 1,
     },
     {
       id: 8,
       title: 'Product Roadmap',
-      owner_id: 99,
-      member_count: 2,
-      ticket_count: 4,
-      tasks_to_do_count: 2,
-      tasks_high_prio_count: 0,
+      ownerId: 99,
+      memberCount: 2,
+      ticketCount: 4,
+      tasksToDoCount: 2,
+      highPriorityTaskCount: 0,
     },
   ];
   const detail = {
     ...summaries[0],
     members: [
-      { id: 42, email: 'ada@example.com', fullname: 'Ada Lovelace' },
-      { id: 43, email: 'grace@example.com', fullname: 'Grace Hopper' },
+      { id: 42, email: 'ada@example.com', fullName: 'Ada Lovelace' },
+      { id: 43, email: 'grace@example.com', fullName: 'Grace Hopper' },
     ],
     tasks: [],
   };
@@ -46,7 +45,7 @@ describe('BoardsStore', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     TestBed.configureTestingModule({
-      providers: [BoardsStore, { provide: BoardsApi, useValue: api }],
+      providers: [BoardsStore, { provide: BoardsRepository, useValue: api }],
     });
   });
 
@@ -68,9 +67,9 @@ describe('BoardsStore', () => {
     expect(loadingStore.status()).toBe('loading');
 
     TestBed.resetTestingModule();
-    api.getBoards.mockReturnValue(throwError(() => new HttpErrorResponse({ status: 0 })));
+    api.getBoards.mockReturnValue(throwError(() => ({ kind: 'network' })));
     TestBed.configureTestingModule({
-      providers: [BoardsStore, { provide: BoardsApi, useValue: api }],
+      providers: [BoardsStore, { provide: BoardsRepository, useValue: api }],
     });
     const failedStore = TestBed.inject(BoardsStore);
     failedStore.loadBoards();
@@ -80,9 +79,11 @@ describe('BoardsStore', () => {
 
   it('opens create mode, resolves unique members and creates a board', () => {
     api.findMember.mockReturnValue(
-      of({ id: 43, email: 'grace@example.com', fullname: 'Grace Hopper' }),
+      of({ id: 43, email: 'grace@example.com', fullName: 'Grace Hopper' }),
     );
-    api.createBoard.mockReturnValue(of({ ...summaries[0], id: 9, title: 'Angular Migration' }));
+    api.createBoard.mockReturnValue(
+      of({ ...summaries[0], id: 9, title: 'Angular Migration' }),
+    );
     const store = TestBed.inject(BoardsStore);
 
     store.openCreateBoard();
@@ -102,9 +103,7 @@ describe('BoardsStore', () => {
   });
 
   it('maps an unknown create-board member without adding it', () => {
-    api.findMember.mockReturnValue(
-      throwError(() => new HttpErrorResponse({ status: 404 })),
-    );
+    api.findMember.mockReturnValue(throwError(() => ({ kind: 'not-found' })));
     const store = TestBed.inject(BoardsStore);
 
     store.openCreateBoard();
@@ -130,7 +129,9 @@ describe('BoardsStore', () => {
     expect(api.updateBoard).toHaveBeenCalledWith(7, { members: [42] });
 
     store.renameBoard('Renamed Board');
-    expect(api.updateBoard).toHaveBeenLastCalledWith(7, { title: 'Renamed Board' });
+    expect(api.updateBoard).toHaveBeenLastCalledWith(7, {
+      title: 'Renamed Board',
+    });
     expect(store.selectedBoard()?.title).toBe('Renamed Board');
   });
 
@@ -149,9 +150,7 @@ describe('BoardsStore', () => {
   });
 
   it('keeps create mode open and exposes a failed board write', () => {
-    api.createBoard.mockReturnValue(
-      throwError(() => new HttpErrorResponse({ status: 400 })),
-    );
+    api.createBoard.mockReturnValue(throwError(() => ({ kind: 'validation' })));
     const store = TestBed.inject(BoardsStore);
     store.openCreateBoard();
 

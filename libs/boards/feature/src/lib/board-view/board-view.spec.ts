@@ -50,11 +50,17 @@ describe('BoardView', () => {
       ],
     });
 
-    expect(screen.getByRole('heading', { name: 'Migration Board' })).toBeTruthy();
+    expect(
+      screen.getByRole('heading', { name: 'Migration Board' }),
+    ).toBeTruthy();
     expect(screen.getByRole('heading', { name: 'To-do' })).toBeTruthy();
     expect(screen.getByRole('heading', { name: 'Done' })).toBeTruthy();
-    fireEvent.click(screen.getByRole('button', { name: 'Add task to In-progress' }));
-    fireEvent.click(screen.getByRole('button', { name: 'Open Build migration safety net' }));
+    fireEvent.click(
+      screen.getByRole('button', { name: 'Add task to In-progress' }),
+    );
+    fireEvent.click(
+      screen.getByRole('button', { name: 'Open Build migration safety net' }),
+    );
     expect(createTask).toHaveBeenCalledWith('in-progress');
     expect(selected).toHaveBeenCalledWith(21);
   });
@@ -73,5 +79,37 @@ describe('BoardView', () => {
       target: { value: 'migration' },
     });
     expect(searched).toHaveBeenCalledWith('migration');
+  });
+
+  it('provides accessible member overflow and task move controls', async () => {
+    const moved = vi.fn();
+    const boardWithOverflow = {
+      ...board,
+      members: [
+        ...board.members,
+        { id: 44, email: 'linus@example.com', fullName: 'Linus Torvalds' },
+        {
+          id: 45,
+          email: 'margaret@example.com',
+          fullName: 'Margaret Hamilton',
+        },
+        { id: 46, email: 'alan@example.com', fullName: 'Alan Turing' },
+      ],
+    };
+    await render(BoardView, {
+      bindings: [
+        inputBinding('board', () => boardWithOverflow),
+        inputBinding('tasksByStatus', () => tasksByStatus),
+        outputBinding('taskMoved', moved),
+      ],
+    });
+
+    expect(screen.getByLabelText('1 more board member')).toBeTruthy();
+    fireEvent.click(
+      screen.getByRole('button', {
+        name: 'Move Build migration safety net to In-progress',
+      }),
+    );
+    expect(moved).toHaveBeenCalledWith({ taskId: 21, status: 'in-progress' });
   });
 });

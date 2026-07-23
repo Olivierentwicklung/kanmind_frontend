@@ -4,144 +4,185 @@
     role="dialog"
     aria-modal="true"
     aria-labelledby="board-settings-title"
+    tabindex="-1"
+    libDialogFocus
+    (escapePressed)="closed.emit()"
   >
     <header class="dialog-header">
       <h2 id="board-settings-title" class="font_prime_color">Board Settings</h2>
-      <button type="button" class="icon-button" aria-label="Close board settings" (click)="closed.emit()">
-        <img src="/assets/icons/close_white.svg" alt="">
+      <button
+        type="button"
+        class="icon-button"
+        aria-label="Close board settings"
+        data-dialog-initial-focus
+        (click)="closed.emit()"
+      >
+        <img src="/assets/icons/close_white.svg" alt="" />
       </button>
     </header>
 
     @if (detailStatus() === 'loading') {
-      <div class="dialog-state" aria-live="polite">
-        <span class="spinner" aria-hidden="true"></span>
-        <p>Loading board settings…</p>
-      </div>
+    <div class="dialog-state" aria-live="polite">
+      <span class="spinner" aria-hidden="true"></span>
+      <p>Loading board settings…</p>
+    </div>
     } @else if (detailStatus() === 'error') {
-      <div class="dialog-state" role="alert">
-        <p>Board settings could not be loaded.</p>
-        <button type="button" class="std_btn btn_third" (click)="closed.emit()">Close</button>
-      </div>
+    <div class="dialog-state" role="alert">
+      <p>Board settings could not be loaded.</p>
+      <button type="button" class="std_btn btn_third" (click)="closed.emit()">
+        Close
+      </button>
+    </div>
     } @else if (board(); as currentBoard) {
-      <section class="title-section" aria-labelledby="current-board-title">
-        @if (editingTitle()) {
-          <div class="field">
-            <label for="settings-board-title">Board title</label>
-            <div class="title-edit-row">
-              <input
-                id="settings-board-title"
-                type="text"
-                [formControl]="title"
-                [attr.aria-invalid]="title.touched && title.invalid"
-                aria-describedby="settings-title-error"
-              >
-              <button type="button" class="icon-button" aria-label="Save title" (click)="saveTitle()">
-                <img src="/assets/icons/check_yellow.svg" alt="">
-              </button>
-              <button type="button" class="icon-button" aria-label="Cancel title edit" (click)="cancelTitleEdit()">
-                <img src="/assets/icons/close_yellow.svg" alt="">
-              </button>
-            </div>
-            @if (title.touched && title.invalid) {
-              <p id="settings-title-error" class="error" role="alert">
-                Title must be between 3 and 64 characters long.
-              </p>
-            }
-          </div>
-        } @else {
-          <div class="section-heading">
-            <h3 id="current-board-title">{{ currentBoard.title }}</h3>
-            <button type="button" class="icon-button" aria-label="Edit board title" (click)="beginTitleEdit()">
-              <img src="/assets/icons/edit.svg" alt="">
-            </button>
-          </div>
+    <section class="title-section" aria-labelledby="current-board-title">
+      @if (editingTitle()) {
+      <div class="field">
+        <label for="settings-board-title">Board title</label>
+        <div class="title-edit-row">
+          <input
+            id="settings-board-title"
+            type="text"
+            [formControl]="title"
+            [attr.aria-invalid]="title.touched && title.invalid"
+            aria-describedby="settings-title-error"
+          />
+          <button
+            type="button"
+            class="icon-button"
+            aria-label="Save title"
+            (click)="saveTitle()"
+          >
+            <img src="/assets/icons/check_yellow.svg" alt="" />
+          </button>
+          <button
+            type="button"
+            class="icon-button"
+            aria-label="Cancel title edit"
+            (click)="cancelTitleEdit()"
+          >
+            <img src="/assets/icons/close_yellow.svg" alt="" />
+          </button>
+        </div>
+        @if (title.touched && title.invalid) {
+        <p id="settings-title-error" class="error" role="alert">
+          Title must be between 3 and 64 characters long.
+        </p>
         }
-      </section>
+      </div>
+      } @else {
+      <div class="section-heading">
+        <h3 id="current-board-title">{{ currentBoard.title }}</h3>
+        <button
+          type="button"
+          class="icon-button"
+          aria-label="Edit board title"
+          (click)="beginTitleEdit()"
+        >
+          <img src="/assets/icons/edit.svg" alt="" />
+        </button>
+      </div>
+      }
+    </section>
 
-      <section class="members-section" aria-labelledby="settings-add-members">
-        <h3 id="settings-add-members" class="font_prime_color">Add members</h3>
-        <p>Add the e-mail addresses of the members you wish to add to your board.</p>
-        <div class="invite-row">
-          <div class="field">
-            <label for="settings-member-email">E-mail</label>
-            <input
-              id="settings-member-email"
-              type="email"
-              [formControl]="email"
-              [attr.aria-invalid]="email.touched && (email.invalid || memberStatus() === 'error')"
-              aria-describedby="settings-email-error"
-            >
-          </div>
+    <section class="members-section" aria-labelledby="settings-add-members">
+      <h3 id="settings-add-members" class="font_prime_color">Add members</h3>
+      <p>
+        Add the e-mail addresses of the members you wish to add to your board.
+      </p>
+      <div class="invite-row">
+        <div class="field">
+          <label for="settings-member-email">E-mail</label>
+          <input
+            id="settings-member-email"
+            type="email"
+            [formControl]="email"
+            [attr.aria-invalid]="email.touched && (email.invalid || memberStatus() === 'error')"
+            aria-describedby="settings-email-error"
+          />
+        </div>
+        <button
+          type="button"
+          class="std_btn btn_prime"
+          [disabled]="memberStatus() === 'loading'"
+          (click)="inviteMember()"
+        >
+          Add member
+        </button>
+      </div>
+      @if (email.touched && email.invalid) {
+      <p id="settings-email-error" class="error" role="alert">
+        Please enter a valid email address.
+      </p>
+      } @else if (memberErrorMessage()) {
+      <p id="settings-email-error" class="error" role="alert">
+        {{ memberErrorMessage() }}
+      </p>
+      }
+    </section>
+
+    <section class="added-members" aria-labelledby="settings-members">
+      <h3 id="settings-members">Added members</h3>
+      <ul>
+        @for (member of currentBoard.members; track member.id) {
+        <li>
+          @if (member.id === currentBoard.ownerId) {
+          <span>{{ member.email }} (owner)</span>
+          } @else {
+          <span>{{ member.email }}</span>
           <button
             type="button"
             class="std_btn btn_prime"
-            [disabled]="memberStatus() === 'loading'"
-            (click)="inviteMember()"
+            [disabled]="mutationStatus() === 'loading'"
+            [attr.aria-label]="'Remove ' + member.email"
+            (click)="memberRemoved.emit(member.id)"
           >
-            Add member
+            Remove
           </button>
-        </div>
-        @if (email.touched && email.invalid) {
-          <p id="settings-email-error" class="error" role="alert">
-            Please enter a valid email address.
-          </p>
-        } @else if (memberErrorMessage()) {
-          <p id="settings-email-error" class="error" role="alert">{{ memberErrorMessage() }}</p>
-        }
-      </section>
-
-      <section class="added-members" aria-labelledby="settings-members">
-        <h3 id="settings-members">Added members</h3>
-        <ul>
-          @for (member of currentBoard.members; track member.id) {
-            <li>
-              @if (member.id === currentBoard.ownerId) {
-                <span>{{ member.email }} (owner)</span>
-              } @else {
-                <span>{{ member.email }}</span>
-                <button
-                  type="button"
-                  class="std_btn btn_prime"
-                  [disabled]="mutationStatus() === 'loading'"
-                  [attr.aria-label]="'Remove ' + member.email"
-                  (click)="memberRemoved.emit(member.id)"
-                >
-                  Remove
-                </button>
-              }
-            </li>
           }
-        </ul>
-      </section>
-
-      <section class="delete-section" aria-labelledby="delete-board-heading">
-        <div>
-          <h3 id="delete-board-heading">Delete Board</h3>
-          <p>This action is irreversible. Once you delete this board, it cannot be restored.</p>
-        </div>
-        @if (confirmingDelete()) {
-          <div class="confirm-delete" role="alert">
-            <p>Are you sure you want to delete {{ currentBoard.title }}?</p>
-            <button
-              type="button"
-              class="std_btn btn_prime"
-              [disabled]="mutationStatus() === 'loading'"
-              aria-label="Confirm delete board"
-              (click)="deleted.emit()"
-            >
-              Confirm delete
-            </button>
-            <button type="button" class="std_btn btn_third" (click)="confirmingDelete.set(false)">
-              Cancel
-            </button>
-          </div>
-        } @else {
-          <button type="button" class="std_btn btn_prime" (click)="confirmingDelete.set(true)">
-            <img src="/assets/icons/delete_dark.svg" alt="">
-            Delete board
-          </button>
+        </li>
         }
-      </section>
+      </ul>
+    </section>
+
+    <section class="delete-section" aria-labelledby="delete-board-heading">
+      <div>
+        <h3 id="delete-board-heading">Delete Board</h3>
+        <p>
+          This action is irreversible. Once you delete this board, it cannot be
+          restored.
+        </p>
+      </div>
+      @if (confirmingDelete()) {
+      <div class="confirm-delete" role="alert">
+        <p>Are you sure you want to delete {{ currentBoard.title }}?</p>
+        <button
+          type="button"
+          class="std_btn btn_prime"
+          [disabled]="mutationStatus() === 'loading'"
+          aria-label="Confirm delete board"
+          (click)="deleted.emit()"
+        >
+          Confirm delete
+        </button>
+        <button
+          type="button"
+          class="std_btn btn_third"
+          (click)="confirmingDelete.set(false)"
+        >
+          Cancel
+        </button>
+      </div>
+      } @else {
+      <button
+        type="button"
+        class="std_btn btn_prime"
+        (click)="confirmingDelete.set(true)"
+      >
+        <img src="/assets/icons/delete_dark.svg" alt="" />
+        Delete board
+      </button>
+      }
+    </section>
     }
   </section>
 </div>

@@ -1,4 +1,11 @@
-import { ChangeDetectionStrategy, Component, inject, input, output, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  inject,
+  input,
+  output,
+  signal,
+} from '@angular/core';
 import {
   AbstractControl,
   FormBuilder,
@@ -30,10 +37,14 @@ function trimmedMinLength(length: number): ValidatorFn {
     control.value.trim().length >= length ? null : { minlength: true };
 }
 
-const passwordsMatch: ValidatorFn = (control: AbstractControl): ValidationErrors | null => {
+const passwordsMatch: ValidatorFn = (
+  control: AbstractControl,
+): ValidationErrors | null => {
   const password = control.get('password')?.value;
   const repeatedPassword = control.get('repeatedPassword')?.value;
-  return String(password).trim() === String(repeatedPassword).trim() ? null : { passwordsMismatch: true };
+  return String(password).trim() === String(repeatedPassword).trim()
+    ? null
+    : { passwordsMismatch: true };
 };
 
 @Component({
@@ -72,10 +83,10 @@ export class RegisterForm {
 
     const value = this.form.getRawValue();
     this.submitted.emit({
-      fullname: value.fullname.trim(),
+      fullName: value.fullname.trim(),
       email: value.email.trim(),
       password: value.password.trim(),
-      repeated_password: value.repeatedPassword.trim(),
+      repeatedPassword: value.repeatedPassword.trim(),
     });
   }
 

@@ -1,8 +1,18 @@
-import { HttpErrorResponse } from '@angular/common/http';
 import { computed, inject } from '@angular/core';
 import { Router } from '@angular/router';
-import { AuthApi, LoginResponseDto, SessionStorage } from '@kanmind/auth/data-access';
-import { patchState, signalStore, withComputed, withHooks, withMethods, withState } from '@ngrx/signals';
+import {
+  AuthRepository,
+  AuthRepositoryError,
+  SessionStorage,
+} from '@kanmind/auth/data-access';
+import {
+  patchState,
+  signalStore,
+  withComputed,
+  withHooks,
+  withMethods,
+  withState,
+} from '@ngrx/signals';
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
 import { EMPTY, catchError, exhaustMap, pipe, tap } from 'rxjs';
 import {
@@ -29,40 +39,32 @@ const initialState: AuthState = {
   registrationError: null,
 };
 
-function toSession(dto: LoginResponseDto): AuthSession {
-  return {
-    token: dto.token,
-    userId: dto.user_id,
-    email: dto.email,
-    fullName: dto.fullname,
-  };
-}
-
 function toAuthError(error: unknown): AuthError {
-  if (!(error instanceof HttpErrorResponse)) return 'unexpected';
-  if (error.status === 0) return 'network';
-  if (error.status === 400 || error.status === 401) return 'invalidCredentials';
+  if (!isAuthRepositoryError(error)) return 'unexpected';
+  const repositoryError = error;
+  if (repositoryError.kind === 'network') return 'network';
+  if (repositoryError.kind === 'invalid-credentials')
+    return 'invalidCredentials';
   return 'unexpected';
 }
 
-function validationMessages(error: HttpErrorResponse): readonly string[] {
-  if (!error.error || typeof error.error !== 'object' || Array.isArray(error.error)) return [];
-
-  return Object.values(error.error as Record<string, unknown>).flatMap((value) => {
-    if (typeof value === 'string') return [value];
-    if (Array.isArray(value)) return value.filter((message): message is string => typeof message === 'string');
-    return [];
-  });
+function toRegistrationError(error: unknown): RegistrationError {
+  if (!isAuthRepositoryError(error)) return { kind: 'unexpected' };
+  const repositoryError = error;
+  if (repositoryError.kind === 'network') return { kind: 'network' };
+  if (repositoryError.kind === 'validation') return repositoryError;
+  return { kind: 'unexpected' };
 }
 
-function toRegistrationError(error: unknown): RegistrationError {
-  if (!(error instanceof HttpErrorResponse)) return { kind: 'unexpected' };
-  if (error.status === 0) return { kind: 'network' };
-  if (error.status === 400) {
-    const messages = validationMessages(error);
-    return messages.length > 0 ? { kind: 'validation', messages } : { kind: 'unexpected' };
-  }
-  return { kind: 'unexpected' };
+function isAuthRepositoryError(error: unknown): error is AuthRepositoryError {
+  return (
+    typeof error === 'object' &&
+    error !== null &&
+    'kind' in error &&
+    ['invalid-credentials', 'validation', 'network', 'unexpected'].includes(
+      String(error.kind),
+    )
+  );
 }
 
 export const AuthStore = signalStore(
@@ -72,19 +74,27 @@ export const AuthStore = signalStore(
     isAuthenticated: computed(() => session() !== null),
   })),
   withMethods((store) => {
-    const api = inject(AuthApi);
+    const repository = inject(AuthRepository);
     const storage = inject(SessionStorage);
     const router = inject(Router);
 
     const login = rxMethod<LoginCommand>(
       pipe(
         exhaustMap((command) => {
-          patchState(store, { status: 'loading', error: null, registrationError: null });
-          return api.login(command).pipe(
-            tap((dto) => {
-              const session = toSession(dto);
+          patchState(store, {
+            status: 'loading',
+            error: null,
+            registrationError: null,
+          });
+          return repository.login(command).pipe(
+            tap((session: AuthSession) => {
               storage.write(session);
-              patchState(store, { session, status: 'authenticated', error: null, registrationError: null });
+              patchState(store, {
+                session,
+                status: 'authenticated',
+                error: null,
+                registrationError: null,
+              });
               void router.navigate(['/dashboard']);
             }),
             catchError((error: unknown) => {
@@ -99,10 +109,13 @@ export const AuthStore = signalStore(
     const register = rxMethod<RegistrationCommand>(
       pipe(
         exhaustMap((command) => {
-          patchState(store, { status: 'loading', error: null, registrationError: null });
-          return api.register(command).pipe(
-            tap((dto) => {
-              const session = toSession(dto);
+          patchState(store, {
+            status: 'loading',
+            error: null,
+            registrationError: null,
+          });
+          return repository.register(command).pipe(
+            tap((session: AuthSession) => {
               storage.write(session);
               patchState(store, {
                 session,
@@ -140,9 +153,12 @@ export const AuthStore = signalStore(
     return {
       onInit() {
         const session = storage.read();
-        patchState(store, session
-          ? { session, status: 'authenticated', error: null }
-          : initialState);
+        patchState(
+          store,
+          session
+            ? { session, status: 'authenticated', error: null }
+            : initialState,
+        );
       },
     };
   }),

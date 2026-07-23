@@ -1,4 +1,9 @@
-import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  input,
+  output,
+} from '@angular/core';
 import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 import {
   BoardMember,
@@ -6,12 +11,13 @@ import {
   BoardsLoadStatus,
   BoardsMutationStatus,
 } from '@kanmind/boards/domain';
+import { DialogFocusDirective } from '../dialog-focus/dialog-focus.directive';
 
 const EMAIL_PATTERN = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
 @Component({
   selector: 'lib-create-board-dialog',
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, DialogFocusDirective],
   templateUrl: './create-board-dialog.html',
   styleUrl: './create-board-dialog.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -29,7 +35,11 @@ export class CreateBoardDialog {
 
   readonly title = new FormControl('', {
     nonNullable: true,
-    validators: [Validators.required, Validators.minLength(3), Validators.maxLength(64)],
+    validators: [
+      Validators.required,
+      Validators.minLength(3),
+      Validators.maxLength(64),
+    ],
   });
   readonly email = new FormControl('', {
     nonNullable: true,

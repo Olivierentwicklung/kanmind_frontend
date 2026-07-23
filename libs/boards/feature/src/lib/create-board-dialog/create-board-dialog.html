@@ -4,11 +4,19 @@
     role="dialog"
     aria-modal="true"
     aria-labelledby="create-board-title"
+    tabindex="-1"
+    libDialogFocus
+    (escapePressed)="closed.emit()"
   >
     <header class="dialog-header">
       <h2 id="create-board-title" class="font_prime_color">Add Board</h2>
-      <button type="button" class="icon-button" aria-label="Close create board" (click)="closed.emit()">
-        <img src="/assets/icons/close_white.svg" alt="">
+      <button
+        type="button"
+        class="icon-button"
+        aria-label="Close create board"
+        (click)="closed.emit()"
+      >
+        <img src="/assets/icons/close_white.svg" alt="" />
       </button>
     </header>
 
@@ -20,19 +28,22 @@
           type="text"
           placeholder="Name your board"
           [formControl]="title"
+          data-dialog-initial-focus
           [attr.aria-invalid]="title.touched && title.invalid"
           aria-describedby="create-title-error"
-        >
+        />
         @if (title.touched && title.invalid) {
-          <p id="create-title-error" class="error" role="alert">
-            Title must be between 3 and 64 characters long.
-          </p>
+        <p id="create-title-error" class="error" role="alert">
+          Title must be between 3 and 64 characters long.
+        </p>
         }
       </div>
 
       <section class="members-section" aria-labelledby="create-members-title">
         <h3 id="create-members-title" class="font_prime_color">Add members</h3>
-        <p>Add the e-mail addresses of the members you wish to add to your board.</p>
+        <p>
+          Add the e-mail addresses of the members you wish to add to your board.
+        </p>
         <div class="invite-row">
           <div class="field">
             <label for="create-member-email">E-mail</label>
@@ -42,7 +53,7 @@
               [formControl]="email"
               [attr.aria-invalid]="email.touched && (email.invalid || memberStatus() === 'error')"
               aria-describedby="create-email-error"
-            >
+            />
           </div>
           <button
             type="button"
@@ -54,39 +65,43 @@
           </button>
         </div>
         @if (email.touched && email.invalid) {
-          <p id="create-email-error" class="error" role="alert">
-            Please enter a valid email address.
-          </p>
+        <p id="create-email-error" class="error" role="alert">
+          Please enter a valid email address.
+        </p>
         } @else if (memberErrorMessage()) {
-          <p id="create-email-error" class="error" role="alert">{{ memberErrorMessage() }}</p>
+        <p id="create-email-error" class="error" role="alert">
+          {{ memberErrorMessage() }}
+        </p>
         }
       </section>
 
       <section class="added-members" aria-labelledby="added-members-title">
         <h3 id="added-members-title">Added members</h3>
         @if (members().length > 0) {
-          <ul>
-            @for (member of members(); track member.id) {
-              <li>
-                <span>{{ member.email }}</span>
-                <button
-                  type="button"
-                  class="std_btn btn_prime"
-                  [attr.aria-label]="'Remove ' + member.email"
-                  (click)="memberRemoved.emit(member.id)"
-                >
-                  Remove
-                </button>
-              </li>
-            }
-          </ul>
+        <ul>
+          @for (member of members(); track member.id) {
+          <li>
+            <span>{{ member.email }}</span>
+            <button
+              type="button"
+              class="std_btn btn_prime"
+              [attr.aria-label]="'Remove ' + member.email"
+              (click)="memberRemoved.emit(member.id)"
+            >
+              Remove
+            </button>
+          </li>
+          }
+        </ul>
         } @else {
-          <p>No members added yet.</p>
+        <p>No members added yet.</p>
         }
       </section>
 
       <div class="dialog-actions">
-        <button type="button" class="std_btn btn_third" (click)="closed.emit()">Cancel</button>
+        <button type="button" class="std_btn btn_third" (click)="closed.emit()">
+          Cancel
+        </button>
         <button
           type="submit"
           class="std_btn btn_prime"

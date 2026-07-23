@@ -10,51 +10,25 @@
     "importHelpers": true,
     "target": "es2015",
     "module": "esnext",
-    "lib": [
-      "es2020",
-      "dom"
-    ],
+    "lib": ["es2020", "dom"],
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
-    "strict": false,
+    "strict": true,
     "paths": {
-      "@kanmind/auth/domain": [
-        "./libs/auth/domain/src/index.ts"
-      ],
-      "@kanmind/auth/data-access": [
-        "./libs/auth/data-access/src/index.ts"
-      ],
-      "@kanmind/auth/feature": [
-        "./libs/auth/feature/src/index.ts"
-      ],
-      "@kanmind/legal/feature": [
-        "./libs/legal/feature/src/index.ts"
-      ],
+      "@kanmind/auth/domain": ["./libs/auth/domain/src/index.ts"],
+      "@kanmind/auth/data-access": ["./libs/auth/data-access/src/index.ts"],
+      "@kanmind/auth/feature": ["./libs/auth/feature/src/index.ts"],
+      "@kanmind/legal/feature": ["./libs/legal/feature/src/index.ts"],
       "@kanmind/dashboard/data-access": [
         "./libs/dashboard/data-access/src/index.ts"
       ],
-      "@kanmind/dashboard/domain": [
-        "./libs/dashboard/domain/src/index.ts"
-      ],
-      "@kanmind/dashboard/feature": [
-        "./libs/dashboard/feature/src/index.ts"
-      ],
-      "@kanmind/boards/data-access": [
-        "./libs/boards/data-access/src/index.ts"
-      ],
-      "@kanmind/boards/domain": [
-        "./libs/boards/domain/src/index.ts"
-      ],
-      "@kanmind/boards/feature": [
-        "./libs/boards/feature/src/index.ts"
-      ],
-      "@kanmind/shared/ui": [
-        "./libs/shared/ui/src/index.ts"
-      ]
+      "@kanmind/dashboard/domain": ["./libs/dashboard/domain/src/index.ts"],
+      "@kanmind/dashboard/feature": ["./libs/dashboard/feature/src/index.ts"],
+      "@kanmind/boards/data-access": ["./libs/boards/data-access/src/index.ts"],
+      "@kanmind/boards/domain": ["./libs/boards/domain/src/index.ts"],
+      "@kanmind/boards/feature": ["./libs/boards/feature/src/index.ts"],
+      "@kanmind/shared/ui": ["./libs/shared/ui/src/index.ts"]
     }
   },
-  "exclude": [
-    "node_modules",
-    "tmp"
-  ]
+  "exclude": ["node_modules", "tmp"]
 }

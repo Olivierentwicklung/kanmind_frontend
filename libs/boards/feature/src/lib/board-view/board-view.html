@@ -5,36 +5,41 @@
     class="std_btn btn_prime"
     (click)="createTaskRequested.emit('to-do')"
   >
-    <img src="/assets/icons/add_black.svg" alt="">
+    <img src="/assets/icons/add_black.svg" alt="" />
     Add Task
   </button>
 </div>
 
 <header class="board-toolbar">
   <ul class="member-summary" aria-label="Board members">
-    @for (member of board().members.slice(0, 4); track member.id) {
-      <li>
-        <span
-          class="profile_circle"
-          [attr.aria-label]="member.fullName"
-          [title]="member.fullName"
-        >{{ initials(member.fullName) }}</span>
-      </li>
-    }
-    @if (board().members.length > 4) {
-      <li><span class="profile_circle">+{{ board().members.length - 4 }}</span></li>
+    @for (member of visibleMembers(); track member.id) {
+    <li>
+      <span
+        class="profile_circle"
+        [attr.aria-label]="member.fullName"
+        [title]="member.fullName"
+        >{{ member.initials }}</span
+      >
+    </li>
+    } @if (remainingMemberCount(); as remaining) {
+    <li>
+      <span
+        class="profile_circle"
+        [attr.aria-label]="remaining + (remaining === 1 ? ' more board member' : ' more board members')"
+        >+{{ remaining }}</span
+      >
+    </li>
     }
   </ul>
 
   <label class="search-field">
-    <img src="/assets/icons/search_yellow.svg" alt="">
+    <img src="/assets/icons/search_yellow.svg" alt="" />
     <span class="visually-hidden">Search tasks</span>
     <input
       type="search"
-      aria-label="Search tasks"
       placeholder="Search"
       (input)="searchChanged.emit($any($event.target).value)"
-    >
+    />
   </label>
 
   <button
@@ -43,82 +48,94 @@
     aria-label="Board settings"
     (click)="settingsRequested.emit()"
   >
-    <img src="/assets/icons/settings.svg" alt="">
+    <img src="/assets/icons/settings.svg" alt="" />
   </button>
 </header>
 
 <div class="board-columns">
-  @for (column of columns; track column.status) {
-    <section class="board-column card" [attr.aria-labelledby]="column.status + '-heading'">
-      <header class="column-header">
-        <h2 [id]="column.status + '-heading'" class="font_prime_color">
-          {{ column.label }}
-        </h2>
-        @if (column.status !== 'done') {
+  @for (column of columnViewModels(); track column.status) {
+  <section
+    class="board-column card"
+    [attr.aria-labelledby]="column.status + '-heading'"
+  >
+    <header class="column-header">
+      <h2 [id]="column.status + '-heading'" class="font_prime_color">
+        {{ column.label }}
+      </h2>
+      @if (column.status !== 'done') {
+      <button
+        type="button"
+        class="icon-button"
+        [attr.aria-label]="'Add task to ' + column.label"
+        (click)="createTaskRequested.emit(column.status)"
+      >
+        <img src="/assets/icons/add_yellow.svg" alt="" />
+      </button>
+      }
+    </header>
+
+    <ul class="task-list">
+      @for (item of column.tasks; track item.task.id) { @let task = item.task;
+      <li class="task-card">
+        <button
+          type="button"
+          class="task-open"
+          [attr.aria-label]="'Open ' + task.title"
+          (click)="taskSelected.emit(task.id)"
+        >
+          <span class="task-heading">
+            <strong>{{ task.title }}</strong>
+            <span class="task-meta">
+              <img
+                [src]="'/assets/icons/' + task.priority + '_prio_colored.svg'"
+                [alt]="task.priority + ' priority'"
+              />
+              @if (task.assignee; as assignee) {
+              <span
+                class="profile_circle"
+                [title]="assignee.fullName"
+                [attr.aria-label]="assignee.fullName"
+              >
+                {{ item.assigneeInitials }}
+              </span>
+              } @else {
+              <img src="/assets/icons/face_icon.svg" alt="Unassigned" />
+              }
+            </span>
+          </span>
+          <span class="task-description">{{ task.description }}</span>
+        </button>
+
+        <div
+          class="move-actions"
+          role="group"
+          [attr.aria-label]="'Move ' + task.title"
+        >
+          @if (item.previous; as previous) {
           <button
             type="button"
-            class="icon-button"
-            [attr.aria-label]="'Add task to ' + column.label"
-            (click)="createTaskRequested.emit(column.status)"
+            [attr.aria-label]="'Move ' + task.title + ' to ' + previous.label"
+            (click)="taskMoved.emit({ taskId: task.id, status: previous.status })"
           >
-            <img src="/assets/icons/add_yellow.svg" alt="">
+            <span aria-hidden="true">←</span>
+            {{ previous.label }}
           </button>
-        }
-      </header>
-
-      <ul class="task-list">
-        @for (task of tasksByStatus()[column.status]; track task.id) {
-          <li class="task-card">
-            <button
-              type="button"
-              class="task-open"
-              [attr.aria-label]="'Open ' + task.title"
-              (click)="taskSelected.emit(task.id)"
-            >
-              <span class="task-heading">
-                <strong>{{ task.title }}</strong>
-                <span class="task-meta">
-                  <img
-                    [src]="'/assets/icons/' + task.priority + '_prio_colored.svg'"
-                    [alt]="task.priority + ' priority'"
-                  >
-                  @if (task.assignee; as assignee) {
-                    <span class="profile_circle" [title]="assignee.fullName">
-                      {{ initials(assignee.fullName) }}
-                    </span>
-                  } @else {
-                    <img src="/assets/icons/face_icon.svg" alt="Unassigned">
-                  }
-                </span>
-              </span>
-              <span class="task-description">{{ task.description }}</span>
-            </button>
-
-            <div class="move-actions" aria-label="Move task">
-              @if (previousStatus(task.status); as previous) {
-                <button
-                  type="button"
-                  (click)="taskMoved.emit({ taskId: task.id, status: previous })"
-                >
-                  <span aria-hidden="true">←</span>
-                  {{ statusLabel(previous) }}
-                </button>
-              }
-              @if (nextStatus(task.status); as next) {
-                <button
-                  type="button"
-                  (click)="taskMoved.emit({ taskId: task.id, status: next })"
-                >
-                  {{ statusLabel(next) }}
-                  <span aria-hidden="true">→</span>
-                </button>
-              }
-            </div>
-          </li>
-        } @empty {
-          <li class="empty-column">No tasks</li>
-        }
-      </ul>
-    </section>
+          } @if (item.next; as next) {
+          <button
+            type="button"
+            [attr.aria-label]="'Move ' + task.title + ' to ' + next.label"
+            (click)="taskMoved.emit({ taskId: task.id, status: next.status })"
+          >
+            {{ next.label }}
+            <span aria-hidden="true">→</span>
+          </button>
+          }
+        </div>
+      </li>
+      } @empty {
+      <li class="empty-column">No tasks</li>
+      }
+    </ul>
+  </section>
   }
 </div>
