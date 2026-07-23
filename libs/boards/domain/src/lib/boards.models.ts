@@ -32,4 +32,38 @@ export interface BoardMember {
 
 export interface BoardDetail extends BoardSummary {
   members: readonly BoardMember[];
+  tasks: readonly BoardTask[];
+}
+
+export type BoardTaskStatus = 'to-do' | 'in-progress' | 'review' | 'done';
+export type BoardTaskPriority = 'low' | 'medium' | 'high';
+
+export interface BoardTask {
+  id: number;
+  boardId: number;
+  title: string;
+  description: string;
+  status: BoardTaskStatus;
+  priority: BoardTaskPriority;
+  dueDate: string;
+  commentsCount: number;
+  assignee: BoardMember | null;
+  reviewer: BoardMember | null;
+}
+
+export interface SaveBoardTaskCommand {
+  title: string;
+  description: string;
+  status: BoardTaskStatus;
+  priority: BoardTaskPriority;
+  dueDate: string;
+  assigneeId: number | null;
+  reviewerId: number | null;
+}
+
+export interface TaskComment {
+  id: number;
+  author: string;
+  content: string;
+  createdAt: string;
 }

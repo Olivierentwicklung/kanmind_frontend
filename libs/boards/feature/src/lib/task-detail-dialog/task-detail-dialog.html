@@ -1,0 +1,130 @@
+<div class="dialog-backdrop">
+  <section
+    class="detail-dialog card"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="task-detail-heading"
+  >
+    <header class="dialog-header">
+      <h2 id="task-detail-heading" class="font_prime_color">{{ task().title }}</h2>
+      <div>
+        <button type="button" class="icon-button" aria-label="Edit task" (click)="editRequested.emit()">
+          <img src="/assets/icons/edit.svg" alt="">
+        </button>
+        <button type="button" class="icon-button" aria-label="Close task details" (click)="closed.emit()">
+          <img src="/assets/icons/close_yellow.svg" alt="">
+        </button>
+      </div>
+    </header>
+
+    <label class="status-field">
+      Status
+      <select
+        [value]="task().status"
+        (change)="statusChanged.emit($any($event.target).value)"
+      >
+        <option value="to-do">To-do</option>
+        <option value="in-progress">In-progress</option>
+        <option value="review">Review</option>
+        <option value="done">Done</option>
+      </select>
+    </label>
+
+    <dl class="task-information">
+      <div class="wide">
+        <dt>Description</dt>
+        <dd>{{ task().description || 'No description' }}</dd>
+      </div>
+      <div>
+        <dt>Due date</dt>
+        <dd><time [attr.datetime]="task().dueDate">{{ task().dueDate }}</time></dd>
+      </div>
+      <div>
+        <dt>Priority</dt>
+        <dd class="person">
+          <img [src]="'/assets/icons/' + task().priority + '_prio_colored.svg'" alt="">
+          {{ task().priority }}
+        </dd>
+      </div>
+      <div>
+        <dt>Assignee</dt>
+        <dd class="person">
+          @if (task().assignee; as assignee) {
+            <span class="profile_circle">{{ initials(assignee.fullName) }}</span>
+            {{ assignee.fullName }}
+          } @else {
+            <img src="/assets/icons/face_icon.svg" alt="">
+            Unassigned
+          }
+        </dd>
+      </div>
+      <div>
+        <dt>Reviewer</dt>
+        <dd class="person">
+          @if (task().reviewer; as reviewer) {
+            <span class="profile_circle">{{ initials(reviewer.fullName) }}</span>
+            {{ reviewer.fullName }}
+          } @else {
+            <img src="/assets/icons/face_icon.svg" alt="">
+            Unassigned
+          }
+        </dd>
+      </div>
+    </dl>
+
+    <hr>
+    <section aria-labelledby="activity-heading">
+      <h3 id="activity-heading" class="font_white_color">Activity</h3>
+      <div class="new-comment">
+        <span class="profile_circle">{{ initials(currentUserName()) }}</span>
+        <label>
+          <span class="visually-hidden">Add comment</span>
+          <textarea
+            [formControl]="comment"
+            aria-label="Add comment"
+            (keydown)="onCommentKeydown($event)"
+          ></textarea>
+        </label>
+        <button type="button" aria-label="Send comment" (click)="submitComment()">
+          <img src="/assets/icons/send.svg" alt="">
+        </button>
+      </div>
+
+      @if (commentStatus() === 'loading') {
+        <p aria-live="polite">Loading comments…</p>
+      } @else if (commentStatus() === 'error') {
+        <p role="alert">Comments could not be loaded.</p>
+      } @else {
+        <div class="comment-list">
+          @for (item of comments(); track item.id) {
+            <article class="comment">
+              <span class="profile_circle">{{ initials(item.author) }}</span>
+              <div>
+                <header>
+                  <strong>{{ item.author }}</strong>
+                  <time [attr.datetime]="item.createdAt">{{ item.createdAt | date:'mediumDate' }}</time>
+                  @if (item.author === currentUserName()) {
+                    <button
+                      type="button"
+                      [attr.aria-label]="'Delete comment by ' + item.author"
+                      (click)="commentDeleted.emit(item.id)"
+                    >
+                      <img src="/assets/icons/delete.svg" alt="">
+                    </button>
+                  }
+                </header>
+                <p>{{ item.content }}</p>
+              </div>
+            </article>
+          } @empty {
+            <p>No comments yet.</p>
+          }
+        </div>
+      }
+    </section>
+
+    @if (mutationStatus() === 'error') {
+      <p role="alert" class="operation-error">The task change could not be saved.</p>
+    }
+  </section>
+</div>

@@ -76,6 +76,7 @@ function toBoardDetail(dto: BoardDetailDto): BoardDetail {
   return {
     ...toBoardSummary(dto),
     members: dto.members.map(toBoardMember),
+    tasks: [],
   };
 }
 

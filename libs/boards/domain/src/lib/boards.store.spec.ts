@@ -32,6 +32,7 @@ describe('BoardsStore', () => {
       { id: 42, email: 'ada@example.com', fullname: 'Ada Lovelace' },
       { id: 43, email: 'grace@example.com', fullname: 'Grace Hopper' },
     ],
+    tasks: [],
   };
   const api = {
     getBoards: vi.fn(),

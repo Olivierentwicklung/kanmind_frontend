@@ -20,6 +20,7 @@ export interface BoardMemberDto {
 
 export interface BoardDetailDto extends BoardSummaryDto {
   members: readonly BoardMemberDto[];
+  tasks?: readonly BoardTaskDto[];
 }
 
 export interface CreateBoardRequestDto {
@@ -30,6 +31,44 @@ export interface CreateBoardRequestDto {
 export interface UpdateBoardRequestDto {
   title?: string;
   members?: readonly number[];
+}
+
+export type BoardTaskStatus = 'to-do' | 'in-progress' | 'review' | 'done';
+export type BoardTaskPriority = 'low' | 'medium' | 'high';
+
+export interface BoardTaskDto {
+  id: number;
+  board: number;
+  title: string;
+  description: string;
+  status: BoardTaskStatus;
+  priority: BoardTaskPriority;
+  due_date: string;
+  comments_count: number;
+  assignee: BoardMemberDto | null;
+  reviewer: BoardMemberDto | null;
+}
+
+export interface SaveTaskRequestDto {
+  board: number;
+  title: string;
+  description: string;
+  status: BoardTaskStatus;
+  priority: BoardTaskPriority;
+  assignee_id: number | null;
+  reviewer_id: number | null;
+  due_date: string;
+}
+
+export type UpdateTaskRequestDto =
+  | Partial<SaveTaskRequestDto>
+  | { status: BoardTaskStatus };
+
+export interface TaskCommentDto {
+  id: number;
+  author: string;
+  content: string;
+  created_at: string;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -62,5 +101,38 @@ export class BoardsApi {
 
   deleteBoard(boardId: number): Observable<void> {
     return this.http.delete<void>(`/api/boards/${boardId}/`);
+  }
+
+  createTask(command: SaveTaskRequestDto): Observable<BoardTaskDto> {
+    return this.http.post<BoardTaskDto>('/api/tasks/', command);
+  }
+
+  updateTask(
+    taskId: number,
+    command: UpdateTaskRequestDto,
+  ): Observable<BoardTaskDto> {
+    return this.http.patch<BoardTaskDto>(`/api/tasks/${taskId}/`, command);
+  }
+
+  deleteTask(taskId: number): Observable<void> {
+    return this.http.delete<void>(`/api/tasks/${taskId}/`);
+  }
+
+  getTaskComments(taskId: number): Observable<readonly TaskCommentDto[]> {
+    return this.http.get<readonly TaskCommentDto[]>(
+      `/api/tasks/${taskId}/comments/`,
+    );
+  }
+
+  createTaskComment(taskId: number, content: string): Observable<TaskCommentDto> {
+    return this.http.post<TaskCommentDto>(`/api/tasks/${taskId}/comments/`, {
+      content,
+    });
+  }
+
+  deleteTaskComment(taskId: number, commentId: number): Observable<void> {
+    return this.http.delete<void>(
+      `/api/tasks/${taskId}/comments/${commentId}/`,
+    );
   }
 }
