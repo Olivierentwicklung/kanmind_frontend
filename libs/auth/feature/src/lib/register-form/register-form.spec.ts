@@ -44,7 +44,7 @@ describe('RegisterForm', () => {
     expect(fixture.componentInstance.showError('repeatedPassword')).toBe(true);
   });
 
-  it('emits the trimmed legacy API command for valid input', async () => {
+  it('emits the trimmed registration API command for valid input', async () => {
     const submitted = vi.fn();
     await render(RegisterForm, {
       providers: [provideRouter([])],

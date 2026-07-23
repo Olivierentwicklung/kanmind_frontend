@@ -2,7 +2,7 @@ import { Route } from '@angular/router';
 import { authGuard, landingRedirect } from '@kanmind/auth/domain';
 import { NotFound } from './not-found';
 
-const legacyRedirects: Route[] = [
+const compatibilityRedirects: Route[] = [
   { path: 'pages/auth/login.html', redirectTo: 'login', pathMatch: 'full' },
   {
     path: 'pages/auth/register.html',
@@ -66,7 +66,7 @@ export const appRoutes: Route[] = [
     loadChildren: () =>
       import('@kanmind/boards/feature').then((m) => m.BOARD_ROUTES),
   },
-  ...legacyRedirects,
+  ...compatibilityRedirects,
   {
     path: '**',
     loadComponent: () => NotFound,

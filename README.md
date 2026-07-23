@@ -1,6 +1,6 @@
 # KanMind Frontend
 
-KanMind is a standalone, zoneless Angular 22 application in an integrated Nx workspace. Authentication, legal pages, dashboard, boards, board settings, tasks, and comments are native Angular features. The complete vanilla application remains runnable as a frozen comparison baseline.
+KanMind is a standalone, zoneless Angular 22 application in an integrated Nx workspace. Authentication, legal pages, dashboard, boards, board settings, tasks, and comments are native Angular features.
 
 ## Requirements and setup
 
@@ -20,8 +20,6 @@ For a first install without a lockfile-based CI environment, use `npm install` i
 ```text
 apps/kanmind                 Angular application
 apps/kanmind-e2e             Angular Playwright tests
-apps/kanmind-legacy          Frozen vanilla baseline
-apps/kanmind-legacy-e2e      Existing 64-scenario / 128-check suite
 libs/auth/feature            Lazy login page and form
 libs/auth/domain             Session contracts, guard, root Signal Store
 libs/auth/data-access        Login API, storage and auth interceptor
@@ -37,14 +35,14 @@ Nx tags enforce `app -> feature -> domain/data-access` and `domain -> data-acces
 
 ```bash
 npm start                    # Angular at http://127.0.0.1:4200
-npm run serve:legacy         # vanilla baseline at http://127.0.0.1:4174
 npm run build
 npm run lint
 npm test
+npm run test:all
 npm run affected
 ```
 
-The Angular development server proxies `/api/` to `http://127.0.0.1:8000`. The default browser suites do not need Django: Playwright deterministically mocks login and all legacy backend calls.
+The Angular development server proxies `/api/` to `http://127.0.0.1:8000`. The browser suite does not need Django: Playwright deterministically mocks the backend calls used by each scenario.
 
 ## Browser tests
 
@@ -55,14 +53,11 @@ npm run test:e2e
 npm run test:e2e:headed
 npm run test:e2e:ui
 npm run test:e2e:report
-
-npm run test:legacy:e2e
-npm run test:legacy:e2e:headed
-npm run test:legacy:e2e:ui
-npm run test:legacy:e2e:report
 ```
 
-UI mode opens Playwright's interactive browser test explorer. Headed mode opens the tested browser while the normal runner executes. HTML reports are written separately to `playwright-report/angular` and `playwright-report/legacy`.
+UI mode opens Playwright's interactive browser test explorer. Headed mode opens the tested browser while the normal runner executes. The HTML report is written to `playwright-report/angular`.
+
+`npm run test:all` runs lint, all Angular unit and integration tests, the Playwright browser suite, and the production build.
 
 ## Authentication design
 
@@ -72,6 +67,6 @@ NgRx Signal Store `22.0.0-beta.0` is pinned because it is the published line dec
 
 ## Regression workflow
 
-Add unit and Angular Playwright coverage for behavior changes, then run the unchanged legacy suite when checking behavioral parity. Angular owns its CSS, fonts, and icons; it does not import runtime assets or code from `kanmind-legacy`. The legacy snapshot is a regression reference, not a production fallback.
+Add focused unit or integration coverage for behavior changes and Playwright coverage for complete user journeys. Run `npm run test:all` before merging. Earlier implementations remain available through Git history; the workspace contains only the current Angular application.
 
 Repository engineering policy is tracked in `AGENTS.md`, `CODEX-USAGE-GUIDE.md`, and `.agents/skills/`.

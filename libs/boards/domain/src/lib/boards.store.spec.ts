@@ -101,6 +101,20 @@ describe('BoardsStore', () => {
     expect(store.dialog()).toBe('closed');
   });
 
+  it('maps an unknown create-board member without adding it', () => {
+    api.findMember.mockReturnValue(
+      throwError(() => new HttpErrorResponse({ status: 404 })),
+    );
+    const store = TestBed.inject(BoardsStore);
+
+    store.openCreateBoard();
+    store.inviteCreateMember('missing@example.com');
+
+    expect(store.createMembers()).toEqual([]);
+    expect(store.memberStatus()).toBe('error');
+    expect(store.memberError()).toBe('not-found');
+  });
+
   it('loads settings, preserves the owner and updates members and title', () => {
     api.getBoard.mockReturnValue(of(detail));
     api.updateBoard.mockImplementation((_id: number, command: object) =>

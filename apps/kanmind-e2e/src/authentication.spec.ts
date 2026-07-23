@@ -10,9 +10,9 @@ test('root redirects unauthenticated users to login', async ({ page }) => {
   await expect(page.getByRole('heading', { name: 'Log in' })).toBeVisible();
 });
 
-test('legacy login URL redirects and preserves its query', async ({ page }) => {
-  await page.goto('/pages/auth/login.html?from=legacy');
-  await expect(page).toHaveURL(/\/login\?from=legacy$/);
+test('previous login URL redirects and preserves its query', async ({ page }) => {
+  await page.goto('/pages/auth/login.html?from=previous-client');
+  await expect(page).toHaveURL(/\/login\?from=previous-client$/);
 });
 
 test('invalid form exposes email and password validation', async ({ page }) => {
