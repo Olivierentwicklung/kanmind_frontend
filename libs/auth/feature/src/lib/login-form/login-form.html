@@ -1,43 +1,88 @@
-<form class="std_form d_flex_cs_gl f_d_c" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+<form
+  class="std_form d_flex_cs_gl f_d_c"
+  (submit)="submit(); $event.preventDefault()"
+  novalidate
+>
   <h1 class="font_prime_color d_flex_cs_gl w_full">Log in</h1>
   <p class="font_white_color d_flex_cs_gl w_full">Your tasks are calling</p>
 
-  <div class="form_group_w_icon_wo_label w_full" [attr.error]="showError('email')">
-    <img src="/assets/icons/mail_icon.svg" alt="" aria-hidden="true">
-    <input type="email" id="email" formControlName="email" autocomplete="email" (blur)="form.controls.email.markAsTouched()">
+  <div
+    class="form_group_w_icon_wo_label w_full"
+    [attr.error]="showError('email')"
+  >
+    <img src="/assets/icons/mail_icon.svg" alt="" aria-hidden="true" />
+    <input
+      type="email"
+      id="email"
+      [formField]="form.email"
+      autocomplete="email"
+      [attr.aria-invalid]="showError('email')"
+      [attr.aria-describedby]="showError('email') ? 'email-error' : null"
+    />
     <label for="email">Email</label>
-    <p class="error_label" id="email-error">Please enter a valid email address.</p>
+    <p class="error_label" id="email-error">
+      Please enter a valid email address.
+    </p>
   </div>
 
-  <div class="form_group_w_icon_wo_label w_full" [attr.error]="showError('password')">
-    <img src="/assets/icons/password_icon.svg" alt="" aria-hidden="true">
-    <input [type]="passwordVisible() ? 'text' : 'password'" id="password" formControlName="password" autocomplete="current-password" (blur)="form.controls.password.markAsTouched()">
+  <div
+    class="form_group_w_icon_wo_label w_full"
+    [attr.error]="showError('password')"
+  >
+    <img src="/assets/icons/password_icon.svg" alt="" aria-hidden="true" />
+    <input
+      [type]="passwordVisible() ? 'text' : 'password'"
+      id="password"
+      [formField]="form.password"
+      autocomplete="current-password"
+      [attr.aria-invalid]="showError('password')"
+      [attr.aria-describedby]="showError('password') ? 'password-error' : null"
+    />
     <label for="password">Password</label>
-    <button class="password-toggle" type="button" (click)="togglePassword()" [attr.aria-label]="passwordVisible() ? 'Hide password' : 'Show password'">
-      <img [src]="passwordVisible() ? '/assets/icons/pw_visibility_off.svg' : '/assets/icons/pw_visibility.svg'" alt="">
+    <button
+      class="password-toggle"
+      type="button"
+      (click)="togglePassword()"
+      [attr.aria-label]="passwordVisible() ? 'Hide password' : 'Show password'"
+    >
+      <img
+        [src]="passwordVisible() ? '/assets/icons/pw_visibility_off.svg' : '/assets/icons/pw_visibility.svg'"
+        alt=""
+      />
     </button>
     <p class="error_label" id="password-error">Password is required.</p>
   </div>
 
   <p class="login_error" role="alert" aria-live="assertive">
-    @switch (error()) {
-      @case ('invalidCredentials') { Benutzer oder Passwort falsch }
-      @case ('network') { The server is unavailable. Please try again. }
-      @case ('unexpected') { Something went wrong. Please try again. }
-    }
+    @switch (error()) { @case ('invalidCredentials') { Benutzer oder Passwort
+    falsch } @case ('network') { The server is unavailable. Please try again. }
+    @case ('unexpected') { Something went wrong. Please try again. } }
   </p>
 
   <div class="d_flex_cc_gl f_d_r_resp_c w_full">
-    <button type="submit" class="std_btn btn_prime pad_s d_flex_cc_gs" [disabled]="loading()">
-      <img src="/assets/icons/login_icon.svg" alt="" aria-hidden="true">
+    <button
+      type="submit"
+      class="std_btn btn_prime pad_s d_flex_cc_gs"
+      [disabled]="loading()"
+    >
+      <img src="/assets/icons/login_icon.svg" alt="" aria-hidden="true" />
       {{ loading() ? 'Logging in…' : 'Log in' }}
     </button>
-    <button type="button" class="std_btn btn_third pad_s" [disabled]="loading()" (click)="guestRequested.emit()">Guest Log in</button>
+    <button
+      type="button"
+      class="std_btn btn_third pad_s"
+      [disabled]="loading()"
+      (click)="guestRequested.emit()"
+    >
+      Guest Log in
+    </button>
   </div>
 
   <div class="d_flex_cc_gl f_d_r_resp_c w_full">
     <p class="font_white_color">First time here?</p>
     <a routerLink="/register" class="link_prime d_flex_cc_gm">Sign Up now!</a>
   </div>
-  <p class="sr-only" role="status" aria-live="polite">{{ loading() ? 'Login in progress' : '' }}</p>
+  <p class="sr-only" role="status" aria-live="polite">
+    {{ loading() ? 'Login in progress' : '' }}
+  </p>
 </form>

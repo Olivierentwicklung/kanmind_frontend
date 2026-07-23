@@ -1,17 +1,31 @@
-import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
-import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  input,
+  output,
+  signal,
+} from '@angular/core';
+import {
+  form,
+  FormField,
+  maxLength,
+  minLength,
+  pattern,
+  required,
+} from '@angular/forms/signals';
 import {
   BoardMember,
   BoardMemberError,
   BoardsLoadStatus,
   BoardsMutationStatus,
 } from '@kanmind/boards/domain';
+import { DialogFocusDirective } from '../dialog-focus/dialog-focus.directive';
 
 const EMAIL_PATTERN = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
 @Component({
   selector: 'lib-create-board-dialog',
-  imports: [ReactiveFormsModule],
+  imports: [FormField, DialogFocusDirective],
   templateUrl: './create-board-dialog.html',
   styleUrl: './create-board-dialog.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -27,26 +41,31 @@ export class CreateBoardDialog {
   readonly memberRemoved = output<number>();
   readonly submitted = output<string>();
 
-  readonly title = new FormControl('', {
-    nonNullable: true,
-    validators: [Validators.required, Validators.minLength(3), Validators.maxLength(64)],
+  private readonly formModel = signal({
+    title: '',
+    email: '',
   });
-  readonly email = new FormControl('', {
-    nonNullable: true,
-    validators: [Validators.required, Validators.pattern(EMAIL_PATTERN)],
+  readonly boardForm = form(this.formModel, (path) => {
+    required(path.title);
+    minLength(path.title, 3);
+    maxLength(path.title, 64);
+    required(path.email);
+    pattern(path.email, EMAIL_PATTERN);
   });
 
   inviteMember(): void {
-    this.email.markAsTouched();
-    if (this.email.invalid) return;
-    this.memberInvited.emit(this.email.value.trim());
-    this.email.reset();
+    const email = this.boardForm.email();
+    email.markAsTouched();
+    if (email.invalid()) return;
+    this.memberInvited.emit(email.value().trim());
+    email.reset('');
   }
 
   createBoard(): void {
-    this.title.markAsTouched();
-    if (this.title.invalid) return;
-    this.submitted.emit(this.title.value.trim());
+    const title = this.boardForm.title();
+    title.markAsTouched();
+    if (title.invalid()) return;
+    this.submitted.emit(title.value().trim());
   }
 
   memberErrorMessage(): string {

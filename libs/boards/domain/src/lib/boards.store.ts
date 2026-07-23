@@ -1,12 +1,15 @@
-import { HttpErrorResponse } from '@angular/common/http';
 import { computed, inject } from '@angular/core';
 import {
-  BoardDetailDto,
-  BoardMemberDto,
-  BoardSummaryDto,
-  BoardsApi,
+  BoardsRepository,
+  toBoardsRepositoryError,
 } from '@kanmind/boards/data-access';
-import { patchState, signalStore, withComputed, withMethods, withState } from '@ngrx/signals';
+import {
+  patchState,
+  signalStore,
+  withComputed,
+  withMethods,
+  withState,
+} from '@ngrx/signals';
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
 import {
   EMPTY,
@@ -56,44 +59,14 @@ const initialState: BoardsState = {
   memberError: null,
 };
 
-function toBoardSummary(dto: BoardSummaryDto): BoardSummary {
-  return {
-    id: dto.id,
-    title: dto.title,
-    ownerId: dto.owner_id,
-    memberCount: dto.member_count,
-    ticketCount: dto.ticket_count,
-    tasksToDoCount: dto.tasks_to_do_count,
-    highPriorityTaskCount: dto.tasks_high_prio_count,
-  };
-}
-
-function toBoardMember(dto: BoardMemberDto): BoardMember {
-  return { id: dto.id, email: dto.email, fullName: dto.fullname };
-}
-
-function toBoardDetail(dto: BoardDetailDto): BoardDetail {
-  return {
-    ...toBoardSummary(dto),
-    members: dto.members.map(toBoardMember),
-    tasks: [],
-  };
-}
-
 function toBoardsError(error: unknown): BoardsError {
-  if (error instanceof HttpErrorResponse) {
-    if (error.status === 0) return { kind: 'network' };
-    if (error.status === 404) return { kind: 'not-found' };
-    if (error.status === 400) return { kind: 'validation' };
-  }
-  return { kind: 'unexpected' };
+  return toBoardsRepositoryError(error);
 }
 
 function toMemberError(error: unknown): BoardMemberError {
-  if (error instanceof HttpErrorResponse) {
-    if (error.status === 0) return 'network';
-    if (error.status === 404) return 'not-found';
-  }
+  const mapped = toBoardsRepositoryError(error);
+  if (mapped.kind === 'network' || mapped.kind === 'not-found')
+    return mapped.kind;
   return 'unexpected';
 }
 
@@ -104,25 +77,28 @@ export const BoardsStore = signalStore(
       const query = store.searchQuery().trim().toLocaleLowerCase();
       return query.length === 0
         ? store.boards()
-        : store.boards().filter((board) =>
-            board.title.toLocaleLowerCase().includes(query),
-          );
+        : store
+            .boards()
+            .filter((board) => board.title.toLocaleLowerCase().includes(query));
     }),
   })),
-  withMethods((store, api = inject(BoardsApi)) => {
+  withMethods((store, repository = inject(BoardsRepository)) => {
     const loadBoards = rxMethod<void>(
       pipe(
         tap(() => patchState(store, { status: 'loading', error: null })),
         switchMap(() =>
-          api.getBoards().pipe(
+          repository.getBoards().pipe(
             tap((boards) =>
               patchState(store, {
-                boards: boards.map(toBoardSummary),
+                boards,
                 status: 'success',
               }),
             ),
             catchError((error: unknown) => {
-              patchState(store, { status: 'error', error: toBoardsError(error) });
+              patchState(store, {
+                status: 'error',
+                error: toBoardsError(error),
+              });
               return EMPTY;
             }),
           ),
@@ -144,10 +120,10 @@ export const BoardsStore = signalStore(
           }),
         ),
         switchMap((boardId) =>
-          api.getBoard(boardId).pipe(
+          repository.getBoard(boardId).pipe(
             tap((board) =>
               patchState(store, {
-                selectedBoard: toBoardDetail(board),
+                selectedBoard: { ...board, tasks: [] },
                 detailStatus: 'success',
               }),
             ),
@@ -173,13 +149,16 @@ export const BoardsStore = signalStore(
         ),
         switchMap((email) => {
           if (store.createMembers().some((member) => member.email === email)) {
-            patchState(store, { memberStatus: 'error', memberError: 'duplicate' });
+            patchState(store, {
+              memberStatus: 'error',
+              memberError: 'duplicate',
+            });
             return EMPTY;
           }
-          return api.findMember(email).pipe(
+          return repository.findMember(email).pipe(
             tap((member) =>
               patchState(store, {
-                createMembers: [...store.createMembers(), toBoardMember(member)],
+                createMembers: [...store.createMembers(), member],
                 memberStatus: 'success',
                 memberError: null,
               }),
@@ -202,7 +181,7 @@ export const BoardsStore = signalStore(
           patchState(store, { mutationStatus: 'loading', error: null }),
         ),
         exhaustMap((title) =>
-          api
+          repository
             .createBoard({
               title,
               members: store.createMembers().map((member) => member.id),
@@ -210,7 +189,7 @@ export const BoardsStore = signalStore(
             .pipe(
               tap((created) =>
                 patchState(store, {
-                  boards: [...store.boards(), toBoardSummary(created)],
+                  boards: [...store.boards(), created],
                   dialog: 'closed',
                   createMembers: [],
                   mutationStatus: 'idle',
@@ -237,13 +216,16 @@ export const BoardsStore = signalStore(
           const board = store.selectedBoard();
           if (!board) return EMPTY;
           if (board.members.some((member) => member.email === email)) {
-            patchState(store, { memberStatus: 'error', memberError: 'duplicate' });
+            patchState(store, {
+              memberStatus: 'error',
+              memberError: 'duplicate',
+            });
             return EMPTY;
           }
-          return api.findMember(email).pipe(
+          return repository.findMember(email).pipe(
             concatMap((member) => {
-              const members = [...board.members, toBoardMember(member)];
-              return api
+              const members = [...board.members, member];
+              return repository
                 .updateBoard(board.id, {
                   members: members.map((item) => item.id),
                 })
@@ -274,10 +256,14 @@ export const BoardsStore = signalStore(
         concatMap((memberId) => {
           const board = store.selectedBoard();
           if (!board || memberId === board.ownerId) return EMPTY;
-          const members = board.members.filter((member) => member.id !== memberId);
+          const members = board.members.filter(
+            (member) => member.id !== memberId,
+          );
           patchState(store, { mutationStatus: 'loading', error: null });
-          return api
-            .updateBoard(board.id, { members: members.map((member) => member.id) })
+          return repository
+            .updateBoard(board.id, {
+              members: members.map((member) => member.id),
+            })
             .pipe(
               tap(() =>
                 patchState(store, {
@@ -303,13 +289,15 @@ export const BoardsStore = signalStore(
           const board = store.selectedBoard();
           if (!board) return EMPTY;
           patchState(store, { mutationStatus: 'loading', error: null });
-          return api.updateBoard(board.id, { title }).pipe(
+          return repository.updateBoard(board.id, { title }).pipe(
             tap(() =>
               patchState(store, {
                 selectedBoard: { ...board, title },
                 boards: store
                   .boards()
-                  .map((item) => (item.id === board.id ? { ...item, title } : item)),
+                  .map((item) =>
+                    item.id === board.id ? { ...item, title } : item,
+                  ),
                 mutationStatus: 'idle',
               }),
             ),
@@ -331,7 +319,7 @@ export const BoardsStore = signalStore(
           const board = store.selectedBoard();
           if (!board) return EMPTY;
           patchState(store, { mutationStatus: 'loading', error: null });
-          return api.deleteBoard(board.id).pipe(
+          return repository.deleteBoard(board.id).pipe(
             tap(() =>
               patchState(store, {
                 boards: store.boards().filter((item) => item.id !== board.id),
@@ -361,7 +349,8 @@ export const BoardsStore = signalStore(
       removeBoardMember,
       renameBoard,
       deleteSelectedBoard,
-      applySearch: (searchQuery: string): void => patchState(store, { searchQuery }),
+      applySearch: (searchQuery: string): void =>
+        patchState(store, { searchQuery }),
       openCreateBoard: (): void =>
         patchState(store, {
           dialog: 'create',
@@ -373,7 +362,9 @@ export const BoardsStore = signalStore(
         }),
       removeCreateMember: (memberId: number): void =>
         patchState(store, {
-          createMembers: store.createMembers().filter((member) => member.id !== memberId),
+          createMembers: store
+            .createMembers()
+            .filter((member) => member.id !== memberId),
         }),
       closeDialog: (): void =>
         patchState(store, {

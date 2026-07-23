@@ -1,6 +1,12 @@
-import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  input,
+  output,
+  signal,
+} from '@angular/core';
 import { DatePipe } from '@angular/common';
-import { FormControl, ReactiveFormsModule } from '@angular/forms';
+import { disabled, form, FormField } from '@angular/forms/signals';
 import {
   BoardTask,
   BoardTaskStatus,
@@ -8,10 +14,11 @@ import {
   BoardsMutationStatus,
   TaskComment,
 } from '@kanmind/boards/domain';
+import { DialogFocusDirective } from '../dialog-focus/dialog-focus.directive';
 
 @Component({
   selector: 'lib-task-detail-dialog',
-  imports: [DatePipe, ReactiveFormsModule],
+  imports: [DatePipe, FormField, DialogFocusDirective],
   templateUrl: './task-detail-dialog.html',
   styleUrl: './task-detail-dialog.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -29,7 +36,10 @@ export class TaskDetailDialog {
   readonly commentAdded = output<string>();
   readonly commentDeleted = output<number>();
 
-  readonly comment = new FormControl('', { nonNullable: true });
+  private readonly commentModel = signal({ comment: '' });
+  readonly commentForm = form(this.commentModel, (path) => {
+    disabled(path.comment, () => this.mutationStatus() === 'loading');
+  });
 
   initials(fullName: string): string {
     return fullName
@@ -41,10 +51,10 @@ export class TaskDetailDialog {
   }
 
   submitComment(): void {
-    const content = this.comment.value.trim();
+    const content = this.commentForm.comment().value().trim();
     if (!content) return;
     this.commentAdded.emit(content);
-    this.comment.reset();
+    this.commentForm.comment().reset('');
   }
 
   onCommentKeydown(event: KeyboardEvent): void {

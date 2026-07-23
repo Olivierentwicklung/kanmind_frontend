@@ -12,7 +12,9 @@ describe('RegisterForm', () => {
     expect(screen.getByRole('textbox', { name: 'Email' })).toBeTruthy();
     expect(screen.getByLabelText('Password', { exact: true })).toBeTruthy();
     expect(screen.getByLabelText('Confirm password')).toBeTruthy();
-    expect(screen.getByRole('checkbox', { name: /I have read and agree/i })).toBeTruthy();
+    expect(
+      screen.getByRole('checkbox', { name: /I have read and agree/i }),
+    ).toBeTruthy();
   });
 
   it('shows every required validation message after an empty submission', async () => {
@@ -32,12 +34,20 @@ describe('RegisterForm', () => {
   });
 
   it('validates the full name and matching password confirmation', async () => {
-    const { fixture } = await render(RegisterForm, { providers: [provideRouter([])] });
+    const { fixture } = await render(RegisterForm, {
+      providers: [provideRouter([])],
+    });
 
-    fireEvent.input(screen.getByLabelText('Full name'), { target: { value: 'Ada' } });
+    fireEvent.input(screen.getByLabelText('Full name'), {
+      target: { value: 'Ada' },
+    });
     fireEvent.blur(screen.getByLabelText('Full name'));
-    fireEvent.input(screen.getByLabelText('Password', { exact: true }), { target: { value: 'long-enough' } });
-    fireEvent.input(screen.getByLabelText('Confirm password'), { target: { value: 'different' } });
+    fireEvent.input(screen.getByLabelText('Password', { exact: true }), {
+      target: { value: 'long-enough' },
+    });
+    fireEvent.input(screen.getByLabelText('Confirm password'), {
+      target: { value: 'different' },
+    });
     fireEvent.blur(screen.getByLabelText('Confirm password'));
 
     expect(fixture.componentInstance.showError('fullname')).toBe(true);
@@ -51,23 +61,36 @@ describe('RegisterForm', () => {
       bindings: [outputBinding('submitted', submitted)],
     });
 
-    fireEvent.input(screen.getByLabelText('Full name'), { target: { value: '  Ada Lovelace  ' } });
-    fireEvent.input(screen.getByLabelText('Email'), { target: { value: '  ada@example.com  ' } });
-    fireEvent.input(screen.getByLabelText('Password', { exact: true }), { target: { value: 'long-enough' } });
-    fireEvent.input(screen.getByLabelText('Confirm password'), { target: { value: 'long-enough' } });
-    fireEvent.click(screen.getByRole('checkbox', { name: /I have read and agree/i }));
+    fireEvent.input(screen.getByLabelText('Full name'), {
+      target: { value: '  Ada Lovelace  ' },
+    });
+    fireEvent.input(screen.getByLabelText('Email'), {
+      target: { value: '  ada@example.com  ' },
+    });
+    fireEvent.input(screen.getByLabelText('Password', { exact: true }), {
+      target: { value: 'long-enough' },
+    });
+    fireEvent.input(screen.getByLabelText('Confirm password'), {
+      target: { value: 'long-enough' },
+    });
+    fireEvent.click(
+      screen.getByRole('checkbox', { name: /I have read and agree/i }),
+    );
     fireEvent.click(screen.getByRole('button', { name: 'Sign up' }));
 
     expect(submitted).toHaveBeenCalledWith({
-      fullname: 'Ada Lovelace',
+      fullName: 'Ada Lovelace',
       email: 'ada@example.com',
       password: 'long-enough',
-      repeated_password: 'long-enough',
+      repeatedPassword: 'long-enough',
     });
   });
 
   it('renders API validation feedback and disables submission while loading', async () => {
-    const error = { kind: 'validation' as const, messages: ['Email already exists'] };
+    const error = {
+      kind: 'validation' as const,
+      messages: ['Email already exists'],
+    };
     await render(RegisterForm, {
       providers: [provideRouter([])],
       bindings: [
@@ -76,7 +99,12 @@ describe('RegisterForm', () => {
       ],
     });
 
-    expect(screen.getByRole('alert').textContent).toContain('Email already exists');
-    expect((screen.getByRole('button', { name: /Signing up/i }) as HTMLButtonElement).disabled).toBe(true);
+    expect(screen.getByRole('alert').textContent).toContain(
+      'Email already exists',
+    );
+    expect(
+      (screen.getByRole('button', { name: /Signing up/i }) as HTMLButtonElement)
+        .disabled,
+    ).toBe(true);
   });
 });

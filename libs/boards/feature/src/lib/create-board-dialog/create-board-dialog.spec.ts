@@ -19,17 +19,31 @@ describe('CreateBoardDialog', () => {
       ],
     });
 
-    fireEvent.input(screen.getByLabelText('Title'), { target: { value: 'ab' } });
+    fireEvent.input(screen.getByLabelText('Title'), {
+      target: { value: 'ab' },
+    });
     fireEvent.click(screen.getByRole('button', { name: 'Create' }));
     TestBed.tick();
-    expect(screen.getByText('Title must be between 3 and 64 characters long.')).toBeTruthy();
+    expect(
+      screen.getByText('Title must be between 3 and 64 characters long.'),
+    ).toBeTruthy();
     expect(submitted).not.toHaveBeenCalled();
 
-    fireEvent.input(screen.getByLabelText('E-mail'), { target: { value: 'invalid' } });
+    fireEvent.input(screen.getByLabelText('E-mail'), {
+      target: { value: 'invalid' },
+    });
     fireEvent.click(screen.getByRole('button', { name: 'Add member' }));
     TestBed.tick();
-    expect(screen.getByText('Please enter a valid email address.')).toBeTruthy();
+    expect(
+      screen.getByText('Please enter a valid email address.'),
+    ).toBeTruthy();
     expect(memberInvited).not.toHaveBeenCalled();
+
+    const email = screen.getByLabelText('E-mail') as HTMLInputElement;
+    fireEvent.input(email, { target: { value: '  ada@example.com  ' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Add member' }));
+    expect(memberInvited).toHaveBeenCalledWith('ada@example.com');
+    expect(email.value).toBe('');
   });
 
   it('renders members and emits a valid create command', async () => {
@@ -52,5 +66,30 @@ describe('CreateBoardDialog', () => {
     });
     fireEvent.click(screen.getByRole('button', { name: 'Create' }));
     expect(submitted).toHaveBeenCalledWith('Angular Migration');
+  });
+
+  it('disables member and board actions while they are loading', async () => {
+    const memberInvited = vi.fn();
+    await render(CreateBoardDialog, {
+      bindings: [
+        inputBinding('members', () => []),
+        inputBinding('memberStatus', () => 'loading'),
+        inputBinding('mutationStatus', () => 'loading'),
+        inputBinding('memberError', () => null),
+        outputBinding('memberInvited', memberInvited),
+      ],
+    });
+
+    const addMember = screen.getByRole('button', {
+      name: 'Add member',
+    }) as HTMLButtonElement;
+    const create = screen.getByRole('button', {
+      name: 'Creating…',
+    }) as HTMLButtonElement;
+
+    expect(addMember.disabled).toBe(true);
+    expect(create.disabled).toBe(true);
+    fireEvent.click(addMember);
+    expect(memberInvited).not.toHaveBeenCalled();
   });
 });
