@@ -1,0 +1,74 @@
+<section class="card task-insights" aria-labelledby="task-insights-title">
+  <header class="card_header_w_btn">
+    <h2 id="task-insights-title" class="card_title">Task Insights</h2>
+    <div class="mode-switch" role="group" aria-label="Task insight mode">
+      <button
+        type="button"
+        [attr.aria-pressed]="mode() === 'assigned'"
+        [disabled]="status() === 'loading'"
+        (click)="modeChanged.emit('assigned')"
+      >
+        Assigned
+      </button>
+      <button
+        type="button"
+        aria-label="Tasks to review"
+        [attr.aria-pressed]="mode() === 'reviewing'"
+        [disabled]="status() === 'loading'"
+        (click)="modeChanged.emit('reviewing')"
+      >
+        To Review
+      </button>
+    </div>
+  </header>
+
+  @if (status() === 'loading') {
+    <p class="state" aria-live="polite">Loading task insights…</p>
+  } @else if (status() === 'error') {
+    <p class="state error" role="alert">Task insights could not be loaded. Please try again.</p>
+  } @else if (tasks().length === 0) {
+    <p class="state font_prime_color">No tasks available</p>
+  } @else {
+    <div class="table-scroll">
+      <table class="responsive-table">
+        <thead>
+          <tr>
+            <th>Title</th>
+            <th>Due Date</th>
+            <th>Priority</th>
+            <th>Status</th>
+            <th>Comments</th>
+            <th>Assignee</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (task of tasks(); track task.id) {
+            <tr>
+              <td class="title">
+                <button
+                  type="button"
+                  class="task-link"
+                  [attr.aria-label]="'Open task ' + task.title"
+                  (click)="taskSelected.emit({ boardId: task.boardId, taskId: task.id })"
+                >
+                  {{ task.title }}
+                </button>
+              </td>
+              <td>{{ task.dueDate }}</td>
+              <td><span class="priority-badge" [attr.priority]="task.priority"></span><span class="sr-only">{{ task.priority }}</span></td>
+              <td>{{ task.status }}</td>
+              <td>{{ task.commentsCount }}</td>
+              <td>
+                @if (task.assignee; as assignee) {
+                  <span class="profile_circle" [attr.aria-label]="'Assigned to ' + assignee.fullName">{{ assignee.initials }}</span>
+                } @else {
+                  <span class="unassigned">Unassigned</span>
+                }
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</section>

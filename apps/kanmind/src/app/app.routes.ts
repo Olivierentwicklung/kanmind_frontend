@@ -21,7 +21,11 @@ export const appRoutes: Route[] = [
   { path: 'login', loadChildren: () => import('@kanmind/auth/feature').then((m) => m.AUTH_ROUTES) },
   { path: 'register', loadChildren: () => import('@kanmind/auth/feature').then((m) => m.REGISTER_ROUTES) },
   { path: '', loadChildren: () => import('@kanmind/legal/feature').then((m) => m.LEGAL_ROUTES) },
-  { path: 'dashboard', component: MigrationPlaceholder, canActivate: [authGuard], data: { title: 'Dashboard migration' } },
+  {
+    path: 'dashboard',
+    canActivate: [authGuard],
+    loadChildren: () => import('@kanmind/dashboard/feature').then((m) => m.DASHBOARD_ROUTES),
+  },
   { path: 'boards', component: MigrationPlaceholder, canActivate: [authGuard], data: { title: 'Boards migration' } },
   { path: 'board', component: MigrationPlaceholder, canActivate: [authGuard], data: { title: 'Board migration' } },
   ...legacyRedirects,

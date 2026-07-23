@@ -1,0 +1,87 @@
+<h1 class="dashboard-title font_prime_color">
+  <img src="/assets/icons/shake_hands.png" alt="">
+  <span class="font_white_color">Welcome</span> {{ view().fullName }}!
+</h1>
+
+<section class="overview" aria-label="Dashboard overview">
+  <div class="stats">
+    <article class="card stat-card progress-card">
+      <h2 class="card_title">Tasks currently done</h2>
+      <p class="subheading">Assigned tasks</p>
+      <div
+        class="progress"
+        role="progressbar"
+        aria-label="Completed assigned tasks"
+        aria-valuemin="0"
+        aria-valuemax="100"
+        [attr.aria-valuenow]="view().completionPercentage"
+      >
+        <span [style.width.%]="view().completionPercentage"></span>
+      </div>
+      <strong class="font_prime_color">{{ view().completionPercentage }}%</strong>
+    </article>
+
+    <article class="card stat-card urgent-card">
+      <h2 class="card_title">
+        <img src="/assets/icons/high_prio_colored.svg" alt="">
+        Urgent to do
+      </h2>
+      <div class="urgent-content">
+        <p><strong>{{ view().urgentTaskCount }}</strong><span>Tasks</span></p>
+        <span class="divider" aria-hidden="true"></span>
+        <p><strong>{{ view().upcomingDeadline }}</strong><span>Upcoming deadline</span></p>
+      </div>
+    </article>
+
+    <article class="card stat-card">
+      <h2 class="card_title">Your Tasks</h2>
+      <p class="metric"><strong>{{ view().assignedTaskCount }}</strong><span>Assigned to you</span></p>
+    </article>
+
+    <article class="card stat-card">
+      <h2 class="card_title">Member of</h2>
+      <p class="metric"><strong>{{ view().membershipCount }}</strong><span>Boards</span></p>
+    </article>
+  </div>
+
+  <article class="card distribution-card">
+    <h2 class="card_title">Tickets Distribution</h2>
+    <ul>
+      @for (item of view().distribution; track item.label) {
+        <li>
+          <span class="distribution-dot" [attr.data-status]="item.label"></span>
+          <span>{{ item.label }}</span>
+          <strong>{{ item.count }}</strong>
+        </li>
+      }
+    </ul>
+  </article>
+
+  <article class="card boards-card">
+    <header class="card_header_w_btn">
+      <h2 class="card_title">Your boards</h2>
+      <button type="button" class="std_btn btn_prime" (click)="boardsRequested.emit()">
+        <img src="/assets/icons/view_board.svg" alt="">
+        Boards
+      </button>
+    </header>
+    @if (view().boards.length > 0) {
+      <ul class="arrow_list">
+        @for (board of view().boards; track board.id) {
+          <li>
+            <button
+              type="button"
+              class="board-link"
+              (click)="boardSelected.emit(board.id)"
+              [attr.aria-label]="'Open ' + board.title"
+            >
+              {{ board.title }}
+            </button>
+          </li>
+        }
+      </ul>
+    } @else {
+      <p class="empty font_prime_color">No boards available</p>
+    }
+  </article>
+</section>

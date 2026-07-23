@@ -1,0 +1,98 @@
+:host {
+  display: block;
+  margin-top: var(--form-gap);
+  width: 100%;
+}
+
+.task-insights {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  width: 100%;
+}
+
+.mode-switch {
+  border: var(--btn-secondary-border);
+  border-radius: var(--btn-rad);
+  display: flex;
+  overflow: hidden;
+}
+
+.mode-switch button {
+  background: var(--btn-secondary-color);
+  border: 0;
+  color: var(--font-prime-color);
+  cursor: pointer;
+  min-height: 36px;
+  padding: 8px 16px;
+}
+
+.mode-switch button[aria-pressed="true"] {
+  background: var(--btn-prime-color);
+  color: var(--btn-prime-font-color);
+}
+
+.mode-switch button:focus-visible,
+.task-link:focus-visible {
+  outline: 3px solid var(--font-prime-color);
+  outline-offset: -3px;
+}
+
+.mode-switch button:disabled {
+  cursor: wait;
+  opacity: 0.7;
+}
+
+.state {
+  color: var(--font_white_color);
+  padding: 32px;
+  text-align: center;
+}
+
+.state.error {
+  color: #ffb4b4;
+}
+
+.table-scroll {
+  overflow-x: auto;
+}
+
+.task-link {
+  background: transparent;
+  border: 0;
+  color: var(--font_white_color);
+  cursor: pointer;
+  font: inherit;
+  font-weight: bold;
+  padding: 6px;
+  text-align: left;
+}
+
+tbody tr:hover {
+  background-color: var(--card-border-color);
+}
+
+.priority-badge {
+  display: inline-flex;
+}
+
+.unassigned {
+  color: var(--font_sec_color);
+  font-size: 0.875rem;
+}
+
+.sr-only {
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  width: 1px;
+  clip: rect(0, 0, 0, 0);
+}
+
+@media (max-width: 1024px) {
+  tbody tr {
+    border-bottom: 1px solid var(--card-border-color);
+  }
+}
