@@ -15,3 +15,8 @@ tmp/
 .nx/migrate-runs
 __screenshots__/
 vitest.config.*.timestamp*
+
+# Local Codex configuration and guidance
+/.agents/
+/AGENTS.md
+/CODEX-USAGE-GUIDE.md
