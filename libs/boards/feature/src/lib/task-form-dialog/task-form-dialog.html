@@ -34,10 +34,10 @@
       </div>
     </header>
 
-    <form [formGroup]="form" (ngSubmit)="submit()">
+    <form [formRoot]="taskForm" (submit)="submit()">
       <label>
         Status
-        <select formControlName="status">
+        <select [formField]="taskForm.status">
           <option value="to-do">To-do</option>
           <option value="in-progress">In-progress</option>
           <option value="review">Review</option>
@@ -50,13 +50,13 @@
         <input
           id="task-title"
           type="text"
-          formControlName="title"
+          [formField]="taskForm.title"
           data-dialog-initial-focus
-          [attr.aria-invalid]="(submitted() || form.controls.title.touched) && form.controls.title.invalid"
-          [attr.aria-describedby]="(submitted() || form.controls.title.touched) && form.controls.title.invalid ? 'task-title-error' : null"
+          [attr.aria-invalid]="(submitted() || taskForm.title().touched()) && taskForm.title().invalid()"
+          [attr.aria-describedby]="(submitted() || taskForm.title().touched()) && taskForm.title().invalid() ? 'task-title-error' : null"
         />
-        @if ((submitted() || form.controls.title.touched) &&
-        form.controls.title.invalid) {
+        @if ((submitted() || taskForm.title().touched()) &&
+        taskForm.title().invalid()) {
         <span id="task-title-error" class="field-error"
           >Title must be at least 3 characters long.</span
         >
@@ -65,25 +65,25 @@
 
       <label>
         Description
-        <textarea formControlName="description"></textarea>
+        <textarea [formField]="taskForm.description"></textarea>
       </label>
 
       <div class="form-grid">
         <label>
           Assignee
-          <select formControlName="assigneeId">
-            <option [ngValue]="null">Unassigned</option>
+          <select [formField]="taskForm.assigneeId">
+            <option value="">Unassigned</option>
             @for (member of members(); track member.id) {
-            <option [ngValue]="member.id">{{ member.fullName }}</option>
+            <option [value]="member.id">{{ member.fullName }}</option>
             }
           </select>
         </label>
         <label>
           Reviewer
-          <select formControlName="reviewerId">
-            <option [ngValue]="null">Unassigned</option>
+          <select [formField]="taskForm.reviewerId">
+            <option value="">Unassigned</option>
             @for (member of members(); track member.id) {
-            <option [ngValue]="member.id">{{ member.fullName }}</option>
+            <option [value]="member.id">{{ member.fullName }}</option>
             }
           </select>
         </label>
@@ -92,12 +92,12 @@
           <input
             id="task-due-date"
             type="date"
-            formControlName="dueDate"
-            [attr.aria-invalid]="(submitted() || form.controls.dueDate.touched) && form.controls.dueDate.invalid"
-            [attr.aria-describedby]="(submitted() || form.controls.dueDate.touched) && form.controls.dueDate.invalid ? 'task-due-date-error' : null"
+            [formField]="taskForm.dueDate"
+            [attr.aria-invalid]="(submitted() || taskForm.dueDate().touched()) && taskForm.dueDate().invalid()"
+            [attr.aria-describedby]="(submitted() || taskForm.dueDate().touched()) && taskForm.dueDate().invalid() ? 'task-due-date-error' : null"
           />
-          @if ((submitted() || form.controls.dueDate.touched) &&
-          form.controls.dueDate.invalid) {
+          @if ((submitted() || taskForm.dueDate().touched()) &&
+          taskForm.dueDate().invalid()) {
           <span id="task-due-date-error" class="field-error"
             >Due date is required.</span
           >
@@ -105,7 +105,7 @@
         </div>
         <label>
           Priority
-          <select formControlName="priority">
+          <select [formField]="taskForm.priority">
             <option value="low">Low</option>
             <option value="medium">Medium</option>
             <option value="high">High</option>

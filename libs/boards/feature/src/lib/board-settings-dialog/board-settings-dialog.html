@@ -42,8 +42,11 @@
           <input
             id="settings-board-title"
             type="text"
-            [formControl]="title"
-            [attr.aria-invalid]="title.touched && title.invalid"
+            [formField]="settingsForm.title"
+            [attr.aria-invalid]="
+              settingsForm.title().touched() &&
+              settingsForm.title().invalid()
+            "
             aria-describedby="settings-title-error"
           />
           <button
@@ -63,7 +66,7 @@
             <img src="/assets/icons/close_yellow.svg" alt="" />
           </button>
         </div>
-        @if (title.touched && title.invalid) {
+        @if (settingsForm.title().touched() && settingsForm.title().invalid()) {
         <p id="settings-title-error" class="error" role="alert">
           Title must be between 3 and 64 characters long.
         </p>
@@ -95,8 +98,12 @@
           <input
             id="settings-member-email"
             type="email"
-            [formControl]="email"
-            [attr.aria-invalid]="email.touched && (email.invalid || memberStatus() === 'error')"
+            [formField]="settingsForm.email"
+            [attr.aria-invalid]="
+              settingsForm.email().touched() &&
+              (settingsForm.email().invalid() ||
+                memberStatus() === 'error')
+            "
             aria-describedby="settings-email-error"
           />
         </div>
@@ -109,7 +116,7 @@
           Add member
         </button>
       </div>
-      @if (email.touched && email.invalid) {
+      @if (settingsForm.email().touched() && settingsForm.email().invalid()) {
       <p id="settings-email-error" class="error" role="alert">
         Please enter a valid email address.
       </p>

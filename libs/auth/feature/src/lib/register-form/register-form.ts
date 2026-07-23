@@ -1,19 +1,11 @@
 import {
   ChangeDetectionStrategy,
   Component,
-  inject,
   input,
   output,
   signal,
 } from '@angular/core';
-import {
-  AbstractControl,
-  FormBuilder,
-  ReactiveFormsModule,
-  ValidationErrors,
-  ValidatorFn,
-  Validators,
-} from '@angular/forms';
+import { form, FormField, required, validate } from '@angular/forms/signals';
 import { RouterLink } from '@angular/router';
 import { RegistrationCommand, RegistrationError } from '@kanmind/auth/domain';
 
@@ -27,29 +19,9 @@ type RegisterControlName =
 const fullNamePattern = /^[a-zäöüß]+(?: [a-zäöüß]+){1,2}$/i;
 const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
-function trimmedPattern(pattern: RegExp): ValidatorFn {
-  return (control: AbstractControl<string>): ValidationErrors | null =>
-    pattern.test(control.value.trim()) ? null : { pattern: true };
-}
-
-function trimmedMinLength(length: number): ValidatorFn {
-  return (control: AbstractControl<string>): ValidationErrors | null =>
-    control.value.trim().length >= length ? null : { minlength: true };
-}
-
-const passwordsMatch: ValidatorFn = (
-  control: AbstractControl,
-): ValidationErrors | null => {
-  const password = control.get('password')?.value;
-  const repeatedPassword = control.get('repeatedPassword')?.value;
-  return String(password).trim() === String(repeatedPassword).trim()
-    ? null
-    : { passwordsMismatch: true };
-};
-
 @Component({
   selector: 'lib-register-form',
-  imports: [ReactiveFormsModule, RouterLink],
+  imports: [FormField, RouterLink],
   templateUrl: './register-form.html',
   styleUrl: './register-form.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -62,26 +34,42 @@ export class RegisterForm {
   readonly repeatedPasswordVisible = signal(false);
   readonly attempted = signal(false);
 
-  private readonly formBuilder = inject(FormBuilder);
-  readonly form = this.formBuilder.nonNullable.group(
-    {
-      fullname: ['', [Validators.required, trimmedPattern(fullNamePattern)]],
-      email: ['', [Validators.required, trimmedPattern(emailPattern)]],
-      password: ['', [Validators.required, trimmedMinLength(8)]],
-      repeatedPassword: [''],
-      privacyAccepted: [false, Validators.requiredTrue],
-    },
-    { validators: passwordsMatch },
-  );
+  private readonly model = signal({
+    fullname: '',
+    email: '',
+    password: '',
+    repeatedPassword: '',
+    privacyAccepted: false,
+  });
+  readonly form = form(this.model, (path) => {
+    required(path.fullname);
+    validate(path.fullname, ({ value }) =>
+      fullNamePattern.test(value().trim()) ? undefined : { kind: 'pattern' },
+    );
+    required(path.email);
+    validate(path.email, ({ value }) =>
+      emailPattern.test(value().trim()) ? undefined : { kind: 'pattern' },
+    );
+    required(path.password);
+    validate(path.password, ({ value }) =>
+      value().trim().length >= 8 ? undefined : { kind: 'minlength' },
+    );
+    validate(path.repeatedPassword, ({ value, valueOf }) =>
+      value().trim() === valueOf(path.password).trim()
+        ? undefined
+        : { kind: 'passwordsMismatch' },
+    );
+    required(path.privacyAccepted);
+  });
 
   submit(): void {
     this.attempted.set(true);
-    if (this.form.invalid || this.loading()) {
-      this.form.markAllAsTouched();
+    if (this.form().invalid() || this.loading()) {
+      this.form().markAsTouched();
       return;
     }
 
-    const value = this.form.getRawValue();
+    const value = this.model();
     this.submitted.emit({
       fullName: value.fullname.trim(),
       email: value.email.trim(),
@@ -91,12 +79,8 @@ export class RegisterForm {
   }
 
   showError(controlName: RegisterControlName): boolean {
-    const control = this.form.controls[controlName];
-    const interacted = control.touched || this.attempted();
-    if (controlName === 'repeatedPassword') {
-      return interacted && this.form.hasError('passwordsMismatch');
-    }
-    return control.invalid && interacted;
+    const field = this.form[controlName]();
+    return field.invalid() && (field.touched() || this.attempted());
   }
 
   togglePassword(field: 'password' | 'repeatedPassword'): void {

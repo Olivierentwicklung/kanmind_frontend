@@ -97,7 +97,7 @@
         <label>
           <span class="visually-hidden">Add comment</span>
           <textarea
-            [formControl]="comment"
+            [formField]="commentForm.comment"
             aria-label="Add comment"
             (keydown)="onCommentKeydown($event)"
           ></textarea>
@@ -105,6 +105,7 @@
         <button
           type="button"
           aria-label="Send comment"
+          [disabled]="mutationStatus() === 'loading'"
           (click)="submitComment()"
         >
           <img src="/assets/icons/send.svg" alt="" />

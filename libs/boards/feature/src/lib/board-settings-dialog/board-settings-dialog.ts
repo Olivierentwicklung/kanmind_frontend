@@ -5,7 +5,14 @@ import {
   output,
   signal,
 } from '@angular/core';
-import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
+import {
+  form,
+  FormField,
+  maxLength,
+  minLength,
+  pattern,
+  required,
+} from '@angular/forms/signals';
 import {
   BoardDetail,
   BoardMemberError,
@@ -18,7 +25,7 @@ const EMAIL_PATTERN = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
 @Component({
   selector: 'lib-board-settings-dialog',
-  imports: [ReactiveFormsModule, DialogFocusDirective],
+  imports: [FormField, DialogFocusDirective],
   templateUrl: './board-settings-dialog.html',
   styleUrl: './board-settings-dialog.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -38,44 +45,44 @@ export class BoardSettingsDialog {
 
   readonly editingTitle = signal(false);
   readonly confirmingDelete = signal(false);
-  readonly title = new FormControl('', {
-    nonNullable: true,
-    validators: [
-      Validators.required,
-      Validators.minLength(3),
-      Validators.maxLength(64),
-    ],
+  private readonly formModel = signal({
+    title: '',
+    email: '',
   });
-  readonly email = new FormControl('', {
-    nonNullable: true,
-    validators: [Validators.required, Validators.pattern(EMAIL_PATTERN)],
+  readonly settingsForm = form(this.formModel, (path) => {
+    required(path.title);
+    minLength(path.title, 3);
+    maxLength(path.title, 64);
+    required(path.email);
+    pattern(path.email, EMAIL_PATTERN);
   });
 
   beginTitleEdit(): void {
     const board = this.board();
     if (!board) return;
-    this.title.setValue(board.title);
-    this.title.markAsUntouched();
+    this.settingsForm.title().reset(board.title);
     this.editingTitle.set(true);
   }
 
   cancelTitleEdit(): void {
     this.editingTitle.set(false);
-    this.title.reset();
+    this.settingsForm.title().reset('');
   }
 
   saveTitle(): void {
-    this.title.markAsTouched();
-    if (this.title.invalid) return;
-    this.renamed.emit(this.title.value.trim());
+    const title = this.settingsForm.title();
+    title.markAsTouched();
+    if (title.invalid()) return;
+    this.renamed.emit(title.value().trim());
     this.editingTitle.set(false);
   }
 
   inviteMember(): void {
-    this.email.markAsTouched();
-    if (this.email.invalid) return;
-    this.memberInvited.emit(this.email.value.trim());
-    this.email.reset();
+    const email = this.settingsForm.email();
+    email.markAsTouched();
+    if (email.invalid()) return;
+    this.memberInvited.emit(email.value().trim());
+    email.reset('');
   }
 
   memberErrorMessage(): string {

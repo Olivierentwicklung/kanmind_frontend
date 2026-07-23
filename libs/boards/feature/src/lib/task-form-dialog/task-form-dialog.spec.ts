@@ -89,8 +89,11 @@ describe('TaskFormDialog', () => {
     fireEvent.input(screen.getByLabelText('Due date'), {
       target: { value: '2099-09-30' },
     });
-    fireEvent.change(screen.getByLabelText('Priority'), {
+    fireEvent.input(screen.getByLabelText('Priority'), {
       target: { value: 'high' },
+    });
+    fireEvent.input(screen.getByLabelText('Assignee'), {
+      target: { value: '42' },
     });
     const form = screen.getByRole('dialog').querySelector('form');
     expect(form).toBeTruthy();
@@ -101,6 +104,8 @@ describe('TaskFormDialog', () => {
         title: 'Angular parity',
         status: 'review',
         priority: 'high',
+        assigneeId: 42,
+        reviewerId: null,
         dueDate: '2099-09-30',
       }),
     );

@@ -1,7 +1,6 @@
 <form
   class="std_form d_flex_cs_gl f_d_c"
-  [formGroup]="form"
-  (ngSubmit)="submit()"
+  (submit)="submit(); $event.preventDefault()"
   novalidate
 >
   <h1 class="font_prime_color d_flex_cs_gl w_full">Log in</h1>
@@ -15,11 +14,10 @@
     <input
       type="email"
       id="email"
-      formControlName="email"
+      [formField]="form.email"
       autocomplete="email"
       [attr.aria-invalid]="showError('email')"
       [attr.aria-describedby]="showError('email') ? 'email-error' : null"
-      (blur)="form.controls.email.markAsTouched()"
     />
     <label for="email">Email</label>
     <p class="error_label" id="email-error">
@@ -35,11 +33,10 @@
     <input
       [type]="passwordVisible() ? 'text' : 'password'"
       id="password"
-      formControlName="password"
+      [formField]="form.password"
       autocomplete="current-password"
       [attr.aria-invalid]="showError('password')"
       [attr.aria-describedby]="showError('password') ? 'password-error' : null"
-      (blur)="form.controls.password.markAsTouched()"
     />
     <label for="password">Password</label>
     <button
