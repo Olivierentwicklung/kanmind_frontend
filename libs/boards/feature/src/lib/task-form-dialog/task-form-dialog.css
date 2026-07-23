@@ -3,13 +3,17 @@
   z-index: 20;
   inset: 0;
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  overflow-x: hidden;
   overflow-y: auto;
   place-items: center;
   padding: 32px;
   background: rgb(0 0 0 / 60%);
 }
 .task-dialog {
-  width: min(760px, 100%);
+  width: 100%;
+  max-width: 760px;
+  min-width: 0;
   padding: clamp(24px, 5vw, 48px);
 }
 header, header div, footer { display: flex; align-items: center; justify-content: space-between; gap: 12px; }

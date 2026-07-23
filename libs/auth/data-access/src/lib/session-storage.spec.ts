@@ -4,7 +4,7 @@ import { AUTH_STORAGE_KEYS, SessionStorage } from './session-storage';
 describe('SessionStorage', () => {
   beforeEach(() => { localStorage.clear(); TestBed.configureTestingModule({}); });
 
-  it('persists and hydrates every legacy key', () => {
+  it('persists and hydrates every compatible storage key', () => {
     const service = TestBed.inject(SessionStorage);
     const session = { token: 'abc', userId: 42, email: 'a@b.test', fullName: 'A B' };
     service.write(session);

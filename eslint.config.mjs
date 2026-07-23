@@ -20,10 +20,11 @@ export default [
           enforceBuildableLibDependency: true,
           allow: ['^.*/eslint(\\.base)?\\.config\\.[cm]?[jt]s$'],
           depConstraints: [
-            { sourceTag: 'type:app', onlyDependOnLibsWithTags: ['type:feature', 'type:domain', 'type:data-access'] },
-            { sourceTag: 'type:feature', onlyDependOnLibsWithTags: ['type:domain', 'type:data-access'] },
+            { sourceTag: 'type:app', onlyDependOnLibsWithTags: ['type:feature', 'type:domain', 'type:data-access', 'type:ui'] },
+            { sourceTag: 'type:feature', onlyDependOnLibsWithTags: ['type:domain', 'type:data-access', 'type:ui'] },
             { sourceTag: 'type:domain', onlyDependOnLibsWithTags: ['type:data-access'] },
             { sourceTag: 'type:data-access', onlyDependOnLibsWithTags: [] },
+            { sourceTag: 'type:ui', onlyDependOnLibsWithTags: ['type:ui', 'type:util'] },
           ],
         },
       ],

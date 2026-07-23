@@ -5,6 +5,8 @@
 }
 .board-main {
   display: flex;
+  width: 100%;
+  min-width: 0;
   min-height: calc(100vh - 168px);
   flex: 1;
   align-items: stretch;

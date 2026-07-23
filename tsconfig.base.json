@@ -47,6 +47,9 @@
       ],
       "@kanmind/boards/feature": [
         "./libs/boards/feature/src/index.ts"
+      ],
+      "@kanmind/shared/ui": [
+        "./libs/shared/ui/src/index.ts"
       ]
     }
   },
