@@ -22,23 +22,23 @@ Treat `package.json` as the declared dependency contract and
 `package-lock.json` as the reproducible installed resolution. Do not upgrade,
 downgrade, or replace either contract unless the task explicitly requires it.
 
-| Area | Declared / lockfile-verified configuration |
-| --- | --- |
-| Workspace package | `kanmind-frontend` |
-| Package manager | npm |
-| Main branch | `main` |
-| Primary app | `kanmind` |
-| Browser-test app | `kanmind-e2e` |
-| Angular | declared `~22.0.4`; core resolves to `22.0.8` |
-| Nx | declared/resolved `23.1.0` |
-| TypeScript | declared `~6.0.3`; resolves to `6.0.3`; strict mode |
-| NgRx Signal Store | declared `^22.0.0-beta.0`; resolves to `22.0.0-beta.0` |
-| RxJS | declared `~7.8.0`; resolves to `7.8.2` |
+| Area                   | Declared / lockfile-verified configuration                                     |
+| ---------------------- | ------------------------------------------------------------------------------ |
+| Workspace package      | `kanmind-frontend`                                                             |
+| Package manager        | npm                                                                            |
+| Main branch            | `main`                                                                         |
+| Primary app            | `kanmind`                                                                      |
+| Browser-test app       | `kanmind-e2e`                                                                  |
+| Angular                | declared `~22.0.4`; core resolves to `22.0.8`                                  |
+| Nx                     | declared/resolved `23.1.0`                                                     |
+| TypeScript             | declared `~6.0.3`; resolves to `6.0.3`; strict mode                            |
+| NgRx Signal Store      | declared `^22.0.0-beta.0`; resolves to `22.0.0-beta.0`                         |
+| RxJS                   | declared `~7.8.0`; resolves to `7.8.2`                                         |
 | Unit/integration tests | Vitest `4.1.10`, Angular build test executor, Angular Testing Library `19.4.1` |
-| Browser tests | Playwright `1.61.1` |
-| Styling | CSS; no Tailwind configuration |
-| API base path | `/api/` |
-| CI Node runtime | Node 24 |
+| Browser tests          | Playwright `1.61.1`                                                            |
+| Styling                | CSS; no Tailwind configuration                                                 |
+| API base path          | `/api/`                                                                        |
+| CI Node runtime        | Node 24                                                                        |
 
 Node 24 is verified in `.github/workflows/ci.yml`; the package does not declare
 an `engines` requirement. Do not describe Node 24 as an npm-enforced constraint.
@@ -321,13 +321,13 @@ authoritative.
 
 Use the smallest valid state lifetime.
 
-| State kind | Repository decision |
-| --- | --- |
-| Local display/form/focus state | component signals or Signal Forms |
-| Dashboard screen state | page-provided `DashboardStore` |
-| Boards collection state | page-provided `BoardsStore` |
-| Board detail/task state | page-provided `BoardStore` |
-| Cross-route authenticated session | root-provided `AuthStore` |
+| State kind                        | Repository decision               |
+| --------------------------------- | --------------------------------- |
+| Local display/form/focus state    | component signals or Signal Forms |
+| Dashboard screen state            | page-provided `DashboardStore`    |
+| Boards collection state           | page-provided `BoardsStore`       |
+| Board detail/task state           | page-provided `BoardStore`        |
+| Cross-route authenticated session | root-provided `AuthStore`         |
 
 Do not make a store root-provided merely for injection convenience.
 
@@ -687,10 +687,10 @@ Review it with architecture-affecting package/Nx upgrades and at least once per
 quarter while the project is active. The engineering owner or maintainer
 responsible for the affected scope should review policy changes.
 
-`AGENTS.md`, `CODEX-USAGE-GUIDE.md`, and the six `.agents/skills/*/SKILL.md`
-files are tracked repository policy. Keep them synchronized when an
-architecture or workflow decision changes; normal Git status and review must
-show their modifications.
+`AGENTS.md`, `CODEX-USAGE-GUIDE.md`, and `.agents/skills/*/SKILL.md` are
+tracked repository policy. Keep them synchronized when an architecture or
+workflow decision changes; normal Git status and review must show their
+modifications.
 
 The explicit `@nx/eslint:lint` project targets are valid for the installed Nx
 23 workspace but emit an Nx 24 deprecation warning. Convert them to inferred

@@ -46,7 +46,7 @@ Test:
 - reset
 - entity updates
 - selected higher-order operator behavior where important
-- navigation and notification side effects
+- navigation and other configured side effects
 
 ## Resources
 

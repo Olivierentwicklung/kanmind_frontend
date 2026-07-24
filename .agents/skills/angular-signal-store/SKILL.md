@@ -58,9 +58,9 @@ Use `withComputed` for:
 withComputed((store) => ({
   selectedProject: computed(() => {
     const id = store.selectedProjectId();
-    return store.projects().find(project => project.id === id) ?? null;
+    return store.projects().find((project) => project.id === id) ?? null;
   }),
-}))
+}));
 ```
 
 ## 4. Add synchronous methods
@@ -70,9 +70,9 @@ Use intent-revealing names and immutable updates.
 Good:
 
 ```ts
-selectProject(id)
-clearSelection()
-applySearch(query)
+selectProject(id);
+clearSelection();
+applySearch(query);
 ```
 
 Bad:
@@ -107,13 +107,12 @@ loadProjects: rxMethod<void>(
       }),
     ),
     switchMap(() =>
-      projectsApi.getProjects().pipe(
-        tapResponse({
-          next: projects =>
-            patchState(store, {
-              projects,
-              loadStatus: 'success',
-            }),
+      projectsRepository.getProjects().pipe(
+        tap((projects) =>
+          patchState(store, {
+            projects,
+            loadStatus: 'success',
+          }),
         ),
         catchError((error: unknown) => {
           patchState(store, {
@@ -125,7 +124,7 @@ loadProjects: rxMethod<void>(
       ),
     ),
   ),
-)
+);
 ```
 
 ## 6. Dependencies

@@ -28,7 +28,7 @@ A presentational component must:
 - avoid store and API injection
 - avoid routing orchestration
 - avoid shared-state mutation
-- own only local display or form state
+- own only local display, form, or focus state
 - use semantic HTML
 - remain independently testable
 
@@ -42,8 +42,7 @@ Example:
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProjectList {
-  readonly projects =
-    input.required<readonly ProjectCardViewModel[]>();
+  readonly projects = input.required<readonly ProjectCardViewModel[]>();
 
   readonly selected = output<ProjectId>();
   readonly deleted = output<ProjectId>();
