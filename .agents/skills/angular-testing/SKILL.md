@@ -1,6 +1,6 @@
 ---
 name: angular-testing
-description: Use when adding or reviewing Angular 22, Vitest, Playwright, Angular Testing Library, Signal Store, resource, guard or data-access tests.
+description: Add or review KanMind Angular 22 tests with Vitest, Angular Testing Library, Angular HTTP testing utilities, and Playwright. Use for components, Signal Stores, guards, data access, routes, accessibility, or complete browser journeys in this zoneless workspace.
 ---
 
 # Angular 22 Testing Workflow
@@ -50,7 +50,8 @@ Test:
 
 ## Resources
 
-Test:
+The application does not currently use `resource()` or `httpResource()`. If an
+explicitly approved change introduces one, test:
 
 - initial loading
 - successful result
@@ -87,8 +88,6 @@ fakeAsync(...)
 tick(...)
 ```
 
-unless the repository is explicitly legacy Zone-based.
-
 Prefer:
 
 ```ts
@@ -103,7 +102,7 @@ Use `TestBed.tick()` when supported and appropriate.
 2. Implement the smallest correct behavior.
 3. Refactor.
 4. Run focused tests.
-5. Run affected tests.
+5. Run the smallest sufficient repository gate from `AGENTS.md`.
 
 ## Checklist
 
@@ -114,3 +113,4 @@ Use `TestBed.tick()` when supported and appropriate.
 - [ ] Permission behavior covered.
 - [ ] Tests verify behavior, not internals.
 - [ ] No legacy Zone dependency was introduced.
+- [ ] Exact commands and actual results are reported.

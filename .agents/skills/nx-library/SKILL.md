@@ -1,6 +1,6 @@
 ---
 name: nx-library
-description: Use when creating or restructuring an Nx library and assigning scope/type tags and boundaries.
+description: Create or restructure a KanMind Nx library using the workspace's exact scope/type tags, dependency constraints, aliases, and public APIs. Use when adding a justified library boundary, moving ownership, or reviewing cross-library imports.
 ---
 
 # Nx Library Workflow
@@ -21,19 +21,22 @@ Do not create a library only to satisfy a theoretical folder structure.
 ## Choose a type
 
 - `feature`: routed/container orchestration
-- `ui`: presentational UI
 - `domain`: business types, rules and state
 - `data-access`: transport and integration
-- `util`: pure helpers, validators and small guards
+- `ui`: reusable presentational UI
+- `util`: permitted by one boundary rule but no current project uses this type;
+  add it only with an explicit ownership and dependency decision
 
 ## Choose a scope
 
-Use the owning business capability, for example:
+Use one of the configured scopes:
 
 ```text
-scope:projects
-scope:authentication
-scope:portfolio
+scope:app
+scope:auth
+scope:legal
+scope:dashboard
+scope:boards
 scope:shared
 ```
 
@@ -43,7 +46,7 @@ Example:
 
 ```json
 {
-  "tags": ["scope:projects", "type:domain"]
+  "tags": ["scope:boards", "type:domain"]
 }
 ```
 
@@ -57,32 +60,46 @@ Do not deep-import from other libraries.
 
 ## Boundary rules
 
-Validate expected direction:
+Both the type and scope constraints in `eslint.config.mjs` must pass.
+
+Configured type direction:
 
 ```text
-feature -> domain, data-access, ui, util
-domain -> data-access, util
-data-access -> util
-ui -> util
+app         -> feature, domain, data-access, ui
+e2e         -> app
+feature     -> domain, data-access, ui
+domain      -> data-access
+data-access -> no workspace library type
+ui          -> ui, util
 ```
 
-Do not allow:
+Configured scope direction:
 
-- UI -> feature
-- domain -> UI
-- data-access -> feature
-- circular dependencies
-- cross-scope private imports
+```text
+app       -> app, auth, legal, dashboard, boards, shared
+auth      -> auth, shared
+legal     -> legal, auth, shared
+dashboard -> dashboard, auth, shared
+boards    -> boards, auth, shared
+shared    -> shared
+```
+
+Do not weaken these constraints to make an import pass. Do not introduce
+circular dependencies, cross-scope private imports, or another library's
+`src/lib` path.
 
 ## Verification
 
 After creating or moving a library:
 
-1. Run lint for the library.
-2. Run tests for the library.
-3. Run `nx graph` or inspect the graph when useful.
-4. Run affected lint, test and build.
-5. Verify no deep imports remain.
+1. Run the focused Nx lint target using the real project name.
+2. Run its test target when the project owns tests.
+3. Inspect the Nx graph when dependency direction is not obvious.
+4. Run affected checks and a production build for architecture/configuration
+   changes.
+5. Verify that configured aliases and `src/index.ts` expose only the intended
+   API and no deep imports remain.
+6. Report exact commands and actual results.
 
 ## Completion checklist
 

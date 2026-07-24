@@ -1,6 +1,6 @@
 ---
 name: angular-component
-description: Use when creating or refactoring Angular shell, container, presentational or form components.
+description: Create or refactor KanMind standalone Angular shell, container, presentational, or form components. Use when deciding component ownership, signal inputs/outputs, local UI state, Signal Forms, route wiring, or component tests.
 ---
 
 # Angular Component Structure
@@ -100,6 +100,22 @@ Move logic out when it:
 - changes shared state
 - can be tested without rendering a template
 - is reused elsewhere
+
+## Form component rules
+
+Use `@angular/forms/signals` when it supports the required behavior. Keep the
+model signal, field interaction, validation display, and touched state in the
+form component.
+
+A form component must:
+
+- mark invalid submissions as touched
+- expose loading and disabled behavior with native semantics
+- emit a typed domain command or normalized value
+- display mapped backend validation errors without exposing transport details
+
+Use typed reactive forms only for a documented integration or explicitly
+scoped legacy exception. Do not use untyped forms.
 
 ## Tests
 

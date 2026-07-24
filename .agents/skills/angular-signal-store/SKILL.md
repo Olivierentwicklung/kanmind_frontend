@@ -1,6 +1,6 @@
 ---
 name: angular-signal-store
-description: Use when creating, changing or reviewing NgRx Signal Store state, methods, computed values or async workflows.
+description: Create, change, or review KanMind NgRx Signal Store state, computed values, methods, and RxJS workflows. Use when deciding store lifetime, repository dependencies, loading/error state, concurrency, or store tests.
 ---
 
 # NgRx Signal Store Workflow
@@ -18,12 +18,14 @@ Ask:
 Choose:
 
 - component signal for isolated temporary UI state
-- resource for straightforward signal-driven reads
-- component-provided store for one page
-- feature store for several pages in one feature
-- root store only for application-wide state
+- page-provided store for dashboard, boards collection, or board detail state
+- root store only for genuinely cross-route application state; `AuthStore` is
+  the current example
 
 Do not create a root store by default.
+Do not duplicate URL state in a store when route inputs are sufficient.
+Do not introduce `resource()` or `httpResource()` as a parallel state owner
+without the explicit decision required by `AGENTS.md`.
 
 ## 2. Define explicit state
 
@@ -92,7 +94,8 @@ Use `rxMethod` and select concurrency deliberately.
 
 Set loading state before the request.
 
-Use `tapResponse` for success and failure.
+Map both success and failure into application state. The current stores use
+`tap` plus `catchError` and return `EMPTY` after recording the failure.
 
 ```ts
 loadProjects: rxMethod<void>(
@@ -111,11 +114,13 @@ loadProjects: rxMethod<void>(
               projects,
               loadStatus: 'success',
             }),
-          error: error =>
-            patchState(store, {
-              loadStatus: 'error',
-              error: mapProjectsError(error),
-            }),
+        ),
+        catchError((error: unknown) => {
+          patchState(store, {
+            loadStatus: 'error',
+            error: mapProjectsError(error),
+          });
+          return EMPTY;
         }),
       ),
     ),
@@ -127,15 +132,15 @@ loadProjects: rxMethod<void>(
 
 The store may inject:
 
-- data-access abstractions
+- repositories from the owning data-access library
 - router when navigation completes a use case
-- notification abstraction
 - clock, ID or platform abstractions
 
 The store must not depend on:
 
 - presentational components
 - DOM APIs
+- low-level API services
 - concrete third-party clients when an internal abstraction exists
 
 ## 7. Provide at the correct scope
@@ -169,7 +174,7 @@ Test:
 - reset behavior
 - concurrency-sensitive behavior
 - entity changes
-- navigation or notification side effects
+- navigation side effects
 
 Mock the data-access abstraction, not HttpClient internals, when testing the store.
 

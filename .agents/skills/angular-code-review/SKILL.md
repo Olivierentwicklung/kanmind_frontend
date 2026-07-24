@@ -1,6 +1,6 @@
 ---
 name: angular-code-review
-description: Use when reviewing Angular/Nx changes for correctness, architecture, state, tests, accessibility, security and performance.
+description: Review KanMind Angular/Nx changes for correctness, configured boundaries, component and Signal Store ownership, zoneless tests, accessibility, security, and performance. Use for implementation reviews, pull-request reviews, and final diff audits in this workspace.
 ---
 
 # Angular Code Review
@@ -35,7 +35,7 @@ Check:
 
 Check:
 
-- presentational components stay stateless
+- presentational components own only local display, form and focus state
 - containers remain thin
 - no direct HTTP in components
 - no component inheritance
@@ -98,7 +98,8 @@ Check:
 - global state growth
 - heavy computed work
 - image handling
-- SSR/hydration compatibility
+- no unrequested SSR or hydration additions
+- browser APIs remain isolated behind platform/application abstractions
 - caching lifetime and invalidation
 
 ## Review output
@@ -116,5 +117,8 @@ For each finding include:
 - problem
 - consequence
 - recommended fix
+
+Report the exact checks run and their actual results. Mark relevant lint, test,
+build, or E2E checks as not run when applicable and explain why.
 
 Do not approve merely because tests pass.

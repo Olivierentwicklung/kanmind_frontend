@@ -18,23 +18,24 @@ Long-form project and migration documentation belongs in `README.md` and
 
 ## 2. Verified workspace baseline
 
-Use the versions installed in `package.json` and `package-lock.json`. Do not
-upgrade, downgrade, or replace them unless the task explicitly requires it.
+Treat `package.json` as the declared dependency contract and
+`package-lock.json` as the reproducible installed resolution. Do not upgrade,
+downgrade, or replace either contract unless the task explicitly requires it.
 
-| Area | Current repository configuration |
+| Area | Declared / lockfile-verified configuration |
 | --- | --- |
 | Workspace package | `kanmind-frontend` |
 | Package manager | npm |
 | Main branch | `main` |
 | Primary app | `kanmind` |
 | Browser-test app | `kanmind-e2e` |
-| Angular | `~22.0.4` |
-| Nx | `23.1.0` |
-| TypeScript | `~6.0.3`, strict mode |
-| NgRx Signal Store | `^22.0.0-beta.0` |
-| RxJS | `~7.8.0` |
-| Unit/integration tests | Vitest, Angular build test executor, Angular Testing Library |
-| Browser tests | Playwright |
+| Angular | declared `~22.0.4`; core resolves to `22.0.8` |
+| Nx | declared/resolved `23.1.0` |
+| TypeScript | declared `~6.0.3`; resolves to `6.0.3`; strict mode |
+| NgRx Signal Store | declared `^22.0.0-beta.0`; resolves to `22.0.0-beta.0` |
+| RxJS | declared `~7.8.0`; resolves to `7.8.2` |
+| Unit/integration tests | Vitest `4.1.10`, Angular build test executor, Angular Testing Library `19.4.1` |
+| Browser tests | Playwright `1.61.1` |
 | Styling | CSS; no Tailwind configuration |
 | API base path | `/api/` |
 | CI Node runtime | Node 24 |
@@ -686,12 +687,10 @@ Review it with architecture-affecting package/Nx upgrades and at least once per
 quarter while the project is active. The engineering owner or maintainer
 responsible for the affected scope should review policy changes.
 
-Repository risk: `.gitignore` currently ignores `/AGENTS.md`, `/.agents/`, and
-`/CODEX-USAGE-GUIDE.md`. This means local policy changes are not visible in
-normal Git status or shared automatically. Do not claim these files are tracked.
-If the team wants this policy to be durable across contributors, explicitly
-remove those ignore entries and commit the files in a separately approved
-governance change.
+`AGENTS.md`, `CODEX-USAGE-GUIDE.md`, and the six `.agents/skills/*/SKILL.md`
+files are tracked repository policy. Keep them synchronized when an
+architecture or workflow decision changes; normal Git status and review must
+show their modifications.
 
 The explicit `@nx/eslint:lint` project targets are valid for the installed Nx
 23 workspace but emit an Nx 24 deprecation warning. Convert them to inferred
